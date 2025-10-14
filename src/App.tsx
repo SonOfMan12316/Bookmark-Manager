@@ -1,13 +1,28 @@
-import './App.css'
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+} from 'react-router-dom'
+import {
+  SignIn,
+  SignUp,
+  ForgotPassword,
+  ResetPassword,
+} from './components/pages'
 
-function App() {
+const App = () => {
   return (
-    <div className="flex justify-center items-center min-h-screen bg-gray-900">
-      <h1 className="text-4xl font-bold text-400 p-4 border-b-4 border-teal-500">
-        Vite + React + TS + Tailwind Works!
-      </h1>
-    </div>
-  );
+    <Router>
+      <Routes>
+        <Route path="/" element={<Navigate to="sign-in" />} />
+        <Route path="/sign-in" element={<SignIn />} />
+        <Route path="/sign-up" element={<SignUp />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
+      </Routes>
+    </Router>
+  )
 }
 
 export default App
