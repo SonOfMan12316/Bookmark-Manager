@@ -1,3 +1,8 @@
 export { default as Logo } from './light-mode-logo'
 export { default as Bookmark } from './bookmark'
 export { default as Search } from './Search'
+export { default as Hamburger } from './hamburger'
+export { default as Plus } from './plus'
+export { default as Avatar } from './avatar'
+export { default as Home } from './home'
+export { default as Archive } from './archive'
