@@ -11,8 +11,10 @@ import {
   ResetPassword,
   Home,
 } from './components/pages'
+import { useThemeInitializer } from './hooks'
 
 const App = () => {
+  useThemeInitializer()
   return (
     <Router>
       <Routes>
