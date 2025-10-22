@@ -1,7 +1,8 @@
 import { useState, type ReactNode } from 'react'
-import { Archive, Home, Logo } from '../icons'
+import { Archive, Cancel, Home, Logo } from '../icons'
 import { CustomCheckBox } from '../ui'
-import type { Tag } from '../../types/global'
+import { TagOption } from '../../data/bookmark'
+import { useClickOutside } from '../../hooks'
 
 type Categorylabel = 'Home' | 'Archive'
 
@@ -9,26 +10,6 @@ interface CategoryOption {
   label: Categorylabel
   icon: ReactNode
 }
-
-const TagOption: Tag[] = [
-  { name: 'AI', count: 1 },
-  { name: 'Community', count: 5 },
-  { name: 'Compatibility', count: 1 },
-  { name: 'CSS', count: 6 },
-  { name: 'Design', count: 1 },
-  { name: 'Framework', count: 2 },
-  { name: 'Git', count: 1 },
-  { name: 'HTML', count: 2 },
-  { name: 'JavaScript', count: 3 },
-  { name: 'Layout', count: 3 },
-  { name: 'Learning', count: 6 },
-  { name: 'Performance', count: 2 },
-  { name: 'Practice', count: 5 },
-  { name: 'Reference', count: 4 },
-  { name: 'Tips', count: 4 },
-  { name: 'Tools', count: 4 },
-  { name: 'Tutorial', count: 3 },
-]
 
 const CategoryOptions: CategoryOption[] = [
   {
@@ -41,21 +22,46 @@ const CategoryOptions: CategoryOption[] = [
   },
 ]
 
-const SideNav = () => {
+interface SidenavProp {
+  showSidenav: boolean
+  setShowSidenav: (showSidenav: boolean) => void
+}
+
+const SideNav = ({ showSidenav, setShowSidenav }: SidenavProp) => {
   const [activeCategory, setActveCategory] = useState<Categorylabel>('Home')
 
+  const sideNavRef = useClickOutside(() => {
+    setShowSidenav(false)
+  })
+
   return (
-    <div className="hidden lg:block bg-white py-5 w-[296px]">
-      <div className="px-5">
+    <div
+      ref={sideNavRef}
+      className={`
+        flex flex-col z-50 h-full py-3 w-[296px] 
+      bg-white dark:bg-ch-dark-mode-neutral-800 border-r-[1.45px] border-r-ch-light-mode-neutral-300 dark:border-r-ch-dark-mode-neutral-500 
+        transition-transform duration-300 ease-in-out 
+        fixed top-0 left-0 lg:static lg:z-auto
+        lg:translate-x-0 lg:flex-shrink-0 lg:block
+        ${showSidenav ? 'translate-x-0' : '-translate-x-full'}
+      `}
+    >
+      <div
+        onClick={() => setShowSidenav(false)}
+        className="absolute right-0 top-1 lg:hidden text-ch-light-mode-neutral-800 dark:text-white"
+      >
+        <Cancel />
+      </div>
+      <div className="px-5 mt-2 flex-shrink-0">
         <Logo />
       </div>
-      <div className="mt-5 px-4">
+      <div className="mt-5 px-4 flex-grow overflow-y-auto">
         {CategoryOptions.map((category, index) => (
           <div
-            className={`flex items-center gap-1.5 h-10 rounded-lg px-3.5 cursor-pointer ${
+            className={`flex items-center gap-1.5 h-10 rounded-lg px-3.5 cursor-pointer my-1 hover:bg-ch-light-mode-neutral-100 hover:text-black dark:hover:bg-ch-dark-mode-neutral-600 dark:hover:text-white ${
               category.label === activeCategory
-                ? 'bg-ch-light-mode-neutral-100 text-black'
-                : 'text-ch-light-mode-neutral-800'
+                ? 'bg-ch-light-mode-neutral-100 dark:bg-ch-dark-mode-neutral-600 text-black dark:text-white'
+                : 'text-ch-light-mode-neutral-800 dark:text-ch-dark-mode-neutral-100'
             }`}
             onClick={() => setActveCategory(category.label)}
             key={index}
@@ -64,18 +70,20 @@ const SideNav = () => {
             <span className="font-semibold text-base">{category.label}</span>
           </div>
         ))}
-        <div className="pt-4 pl-4 pr-3">
-          <h1 className="uppercase font-bold text-xs text-ch-grey">Tags</h1>
+        <div className="pt-4">
+          <h1 className="uppercase font-bold text-xs text-ch-grey dark:text-ch-dark-mode-neutral-100 pl-4 pr-3">
+            Tags
+          </h1>
           {TagOption.map((tag) => (
-            <div className="flex justify-between items-center h-10">
+            <div className="pl-4 pr-3 flex justify-between items-center h-10 hover:bg-ch-light-mode-neutral-100 hover:text-black dark:hover:bg-ch-dark-mode-neutral-600 dark:hover:text-white text-ch-light-mode-neutral-800 dark:text-ch-dark-mode-neutral-100 rounded-lg cursor-pointer">
               <div className="flex justify-center items-center gap-1.5">
                 <CustomCheckBox />
-                <h1 className="text-ch-light-mode-neutral-800 font-semibold text-base">
-                  {tag.name}
-                </h1>
+                <h1 className=" font-semibold text-base">{tag.name}</h1>
               </div>
-              <div className="h-6 w-6 bg-ch-light-mode-neutral-100 border-[1.45px] border-ch-light-mode-neutral-300 rounded-xl flex items-center justify-center">
-                <span className="font-medium text-xs">{tag.count}</span>
+              <div className="h-6 w-6 bg-ch-light-mode-neutral-100 dark:bg-ch-dark-mode-neutral-600 border-[1.45px] border-ch-light-mode-neutral-300 dark:border-ch-dark-mode-neutral-500 rounded-xl flex items-center justify-center">
+                <span className="font-medium text-xs dark:text-white">
+                  {tag.count}
+                </span>
               </div>
             </div>
           ))}

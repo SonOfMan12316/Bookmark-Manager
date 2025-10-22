@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import {
   Avatar,
   Hamburger,
@@ -12,22 +13,30 @@ import {
 import { Button, Input, PopOver } from '../ui'
 import useUIStore from '../../store/ui'
 
-const Header = () => {
+interface HeaderProps {
+  setShowSidenav: (showSidenav: boolean) => void
+}
+
+const Header = ({ setShowSidenav }: HeaderProps) => {
   const [popOpen, setPopOpen] = useState<boolean>(false)
 
   const { theme, setTheme } = useUIStore()
+  const navigate = useNavigate()
 
   return (
-    <div className="bg-white dark:bg-ch-dark-mode-neutral-800 dark:border-b dark:border-b-ch-dark-mode-neutral-400 h-16 px-4 sm:px-8 py-3 sm:py-6 lg:py-9 flex items-center gap-2 flex-grow">
+    <div className="bg-white dark:bg-ch-dark-mode-neutral-800 dark:border-b-[1.45px] dark:border-b-ch-dark-mode-neutral-500 border-b-ch-light-mode-neutral-100 h-16 px-4 sm:px-8 py-3 sm:py-6 lg:py-9 flex items-center gap-2 flex-grow">
       <div className="flex items-center gap-2 sm:gap-4 flex-1 min-w-0">
-        <Hamburger className="lg:hidden text-ch-light-mode-neutral-900 dark:text-white" />
+        <Hamburger
+          onClick={() => setShowSidenav(true)}
+          className="lg:hidden text-ch-light-mode-neutral-900 dark:text-white"
+        />
         <div className="flex-1 min-w-0 sm:max-w-[320px]">
           <Input
             placeholder="Search by title..."
             placement="start"
             icon={<Search />}
             variant="search"
-            className="w-full dark:text-ch-dark-mode-neutral-100"
+            className="w-full dark:text-ch-dark-mode-neutral-100 text-ch-light-mode-neutral-800"
           />
         </div>
       </div>
@@ -44,28 +53,28 @@ const Header = () => {
               setIsOpen={setPopOpen}
               triggerVariant="naked"
             >
-              <div className="whitespace-nowrap py-3">
-                <div className="mb-4">
-                  <div className="flex gap-2 px-4">
-                    <Avatar />
-                    <div>
-                      <h1 className="font-semibold text-sm dark:text-white text-ch-light-mode-neutral-900">
-                        Etidoh
-                      </h1>
-                      <span className="font-medium text-sm text-ch-light-mode-neutral-800 dark:text-ch-dark-mode-neutral-100">
-                        emilia101@gmail.com
-                      </span>
-                    </div>
+              <div className="px-2">
+                <div className="flex gap-2 py-3 px-2">
+                  <Avatar />
+                  <div>
+                    <h1 className="font-semibold text-sm dark:text-white text-ch-light-mode-neutral-900">
+                      Etidoh Beth
+                    </h1>
+                    <span className="font-medium text-sm text-ch-light-mode-neutral-800 dark:text-ch-dark-mode-neutral-100">
+                      inokon@gmail.com
+                    </span>
                   </div>
-                  <div className="py-1 border-b-[1.45px] transition-none border-b-ch-light-grey dark:border-b-ch-dark-mode-neutral-500"></div>
-                  <div className="flex justify-between px-4 pt-3.5 pb-1.5">
-                    <div className="flex items-center gap-2 text-ch-light-mode-neutral-800 dark:text-ch-dark-mode-neutral-100">
+                </div>
+                <div className="border-b-[1.45px] border-ch-light-grey dark:border-ch-dark-mode-neutral-500 -mx-2"></div>
+                <div className="py-1.5">
+                  <div className="flex items-center justify-between rounded-md p-2 dark:hover:bg-ch-dark-mode-neutral-500 hover:bg-ch-light-mode-neutral-100 dark:hover:text-white hover:text-black text-ch-light-mode-neutral-800 dark:text-ch-dark-mode-neutral-100 transition-colors">
+                    <div className="flex items-center gap-2 ">
                       <Palette />
-                      <span className="font-semibold text-sm ">Theme</span>
+                      <span className="font-semibold text-sm">Theme</span>
                     </div>
                     <div className="p-0.5 rounded-lg flex bg-ch-light-mode-neutral-300 dark:bg-ch-dark-mode-neutral-500">
                       <div
-                        className={`rounded-md w-7.5 h-7.5 flex justify-center items-center cursor-pointer transition-colors text-ch-light-mode-neutral-900 dark:text-white ${
+                        className={`rounded-lg w-7 h-7 flex justify-center items-center cursor-pointer transition-colors text-ch-light-mode-neutral-900 dark:text-white ${
                           theme === 'light'
                             ? 'bg-white dark:bg-ch-dark-mode-neutral-600'
                             : 'bg-transparent'
@@ -75,7 +84,7 @@ const Header = () => {
                         <Sun />
                       </div>
                       <div
-                        className={`rounded-md w-7.5 h-7.5 flex justify-center items-center cursor-pointer transition-colors text-ch-light-mode-neutral-900 dark:text-white ${
+                        className={`rounded-lg w-7 h-7 flex justify-center items-center cursor-pointer transition-colors text-ch-light-mode-neutral-900 dark:text-white ${
                           theme === 'dark'
                             ? 'bg-white dark:bg-ch-dark-mode-neutral-600'
                             : 'bg-transparent'
@@ -86,18 +95,16 @@ const Header = () => {
                       </div>
                     </div>
                   </div>
-                  <div className="pt-1 border-b-[1.45px] border-b-ch-light-grey dark:border-b-ch-dark-mode-neutral-500"></div>
                 </div>
-                <div className="px-4">
-                  <Button
-                    variant="naked"
-                    className="flex items-center gap-2 text-ch-light-mode-neutral-800 dark:text-ch-dark-mode-neutral-100"
+                <div className="border-b-[1.45px] border-ch-light-grey dark:border-ch-dark-mode-neutral-500 -mx-2"></div>
+                <div className="py-1">
+                  <div
+                    onClick={() => navigate('/sign-in')}
+                    className="flex items-center gap-2 p-2 cursor-pointer rounded-md dark:hover:bg-ch-dark-mode-neutral-500 hover:bg-ch-light-mode-neutral-100 text-ch-light-mode-neutral-800 dark:text-ch-dark-mode-neutral-100 dark:hover:text-white hover:text-black transition-colors"
                   >
                     <SignOut />
-                    <div>
-                      <span className="font-semibold text-sm">Logout</span>
-                    </div>
-                  </Button>
+                    <span className="font-semibold text-sm">Logout</span>
+                  </div>
                 </div>
               </div>
             </PopOver>
