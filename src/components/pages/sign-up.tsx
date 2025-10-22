@@ -83,11 +83,11 @@ const SignUp = () => {
         </div>
         <Button className="mt-4.5">Create Account</Button>
         <div className="mt-4.5 sm:mt-6 text-center">
-          <p className="font-medium text-sm text-ch-light-mode-neutral-800">
+          <p className="font-medium text-sm text-ch-light-mode-neutral-800 dark:text-ch-dark-mode-neutral-100">
             Already have an account?{' '}
             <span
               onClick={() => navigate('/sign-in')}
-              className="font-semibold text-ch-light-mode-neutral-900 cursor-pointer"
+              className="font-semibold text-ch-light-mode-neutral-900 dark:text-white cursor-pointer"
             >
               Log in
             </span>

@@ -24,6 +24,7 @@ const SignIn = () => {
         <div>
           <Input
             label="Email"
+            variant="light"
             placeholder=""
             type="email"
             {...register('email', {
@@ -45,6 +46,7 @@ const SignIn = () => {
             label="Password"
             placeholder=""
             type="password"
+            variant="light"
             {...register('password', {
               required: 'Password is required',
               minLength: {
@@ -63,20 +65,20 @@ const SignIn = () => {
           Log in
         </Button>
         <div className="mt-4.5 sm:mt-6 text-center">
-          <p className="font-medium text-sm text-ch-light-mode-neutral-800">
+          <p className="font-medium text-sm text-ch-light-mode-neutral-800 dark:text-ch-dark-mode-neutral-100">
             Forgot password?{' '}
             <span
               onClick={() => navigate('/forgot-password')}
-              className="font-semibold text-ch-light-mode-neutral-900 cursor-pointer"
+              className="font-semibold text-ch-light-mode-neutral-900 dark:text-white cursor-pointer"
             >
               Reset it
             </span>
           </p>
-          <p className="font-medium text-sm text-ch-light-mode-neutral-800 mt-1 sm:mt-3.5">
+          <p className="font-medium text-sm text-ch-light-mode-neutral-800 dark:text-ch-dark-mode-neutral-100 mt-1 sm:mt-3.5">
             Don't have an account?{' '}
             <span
               onClick={() => navigate('/sign-up')}
-              className="font-semibold text-ch-light-mode-neutral-900 cursor-pointer"
+              className="font-semibold text-ch-light-mode-neutral-900 dark:text-white cursor-pointer"
             >
               Sign up
             </span>

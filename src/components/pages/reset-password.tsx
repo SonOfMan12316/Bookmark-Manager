@@ -72,7 +72,7 @@ const ResetPassword = () => {
           <p className="font-medium text-sm">
             <span
               onClick={() => navigate('/sign-in')}
-              className="font-semibold text-ch-light-mode-neutral-900 cursor-pointer"
+              className="font-semibold text-ch-light-mode-neutral-900 dark:text-white cursor-pointer"
             >
               Back to login
             </span>

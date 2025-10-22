@@ -47,12 +47,13 @@ const Popover = ({
       {isOpen && (
         <div
           className={classnames(
-            'absolute z-20 dark:bg-ch-dark-mode-neutral-600 dark:border-ch-dark-mode-neutral-600 bg-white border-ch-light-mode-neutral-100 rounded-lg transition-all duration-300 ease-in-out mt-4.5 border-[1.45px]',
+            'absolute z-20 bg-white dark:bg-ch-dark-mode-neutral-600 rounded-lg transition-all duration-300 ease-in-out mt-4.5',
             {
               'right-0': contentPositionX === 'left',
               'left-0': contentPositionX === 'right',
               'top-8': contentPositionY === 'bottom',
-              'h-fit w-[248px] pt-0 ': isOpen,
+              'h-fit w-[248px] pt-0 border-[1.45px] dark:border-ch-dark-mode-neutral-400 border-ch-light-mode-neutral-100':
+                isOpen,
               'h-0 w-0 overflow-hidden': !isOpen,
               'shadow-budget-popover': !hover,
             }
