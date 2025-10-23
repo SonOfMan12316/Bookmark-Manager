@@ -24,11 +24,11 @@ const Header = ({ setShowSidenav }: HeaderProps) => {
   const navigate = useNavigate()
 
   return (
-    <div className="bg-white dark:bg-ch-dark-mode-neutral-800 dark:border-b-[1.45px] dark:border-b-ch-dark-mode-neutral-500 border-b-ch-light-mode-neutral-100 h-16 px-4 sm:px-8 py-3 sm:py-6 lg:py-9 flex items-center gap-2 flex-grow">
+    <div className="bg-white dark:bg-ch-dark-mode-neutral-800 border-b-[1.45px] dark:border-b-ch-dark-mode-neutral-500 border-b-ch-light-mode-neutral-100 h-16 px-4 sm:px-8 py-3 sm:py-6 lg:py-9 flex items-center gap-2 flex-grow">
       <div className="flex items-center gap-2 sm:gap-4 flex-1 min-w-0">
         <Hamburger
           onClick={() => setShowSidenav(true)}
-          className="lg:hidden text-ch-light-mode-neutral-900 dark:text-white"
+          className="xl:hidden text-ch-light-mode-neutral-900 dark:text-white"
         />
         <div className="flex-1 min-w-0 sm:max-w-[320px]">
           <Input
@@ -53,7 +53,7 @@ const Header = ({ setShowSidenav }: HeaderProps) => {
               setIsOpen={setPopOpen}
               triggerVariant="naked"
             >
-              <div className="px-2">
+              <div className="px-2 w-[248px]">
                 <div className="flex gap-2 py-3 px-2">
                   <Avatar />
                   <div>

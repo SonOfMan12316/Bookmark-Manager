@@ -39,16 +39,20 @@ const SideNav = ({ showSidenav, setShowSidenav }: SidenavProp) => {
       ref={sideNavRef}
       className={`
         flex flex-col z-50 h-full py-3 w-[296px] 
-      bg-white dark:bg-ch-dark-mode-neutral-800 border-r-[1.45px] border-r-ch-light-mode-neutral-300 dark:border-r-ch-dark-mode-neutral-500 
+      bg-white dark:bg-ch-dark-mode-neutral-800  xl:border-none
         transition-transform duration-300 ease-in-out 
-        fixed top-0 left-0 lg:static lg:z-auto
-        lg:translate-x-0 lg:flex-shrink-0 lg:block
-        ${showSidenav ? 'translate-x-0' : '-translate-x-full'}
+        fixed top-0 left-0 xl:static xl:z-auto
+        xl:translate-x-0 xl:flex-shrink-0 xl:block
+        ${
+          showSidenav
+            ? 'translate-x-0 border-r-[1.45px] border-r-ch-light-mode-neutral-300 dark:border-r-ch-dark-mode-neutral-500'
+            : '-translate-x-full'
+        }
       `}
     >
       <div
         onClick={() => setShowSidenav(false)}
-        className="absolute right-0 top-1 lg:hidden text-ch-light-mode-neutral-800 dark:text-white"
+        className="absolute right-0 top-1 xl:hidden text-ch-light-mode-neutral-800 dark:text-white"
       >
         <Cancel />
       </div>
@@ -70,12 +74,15 @@ const SideNav = ({ showSidenav, setShowSidenav }: SidenavProp) => {
             <span className="font-semibold text-base">{category.label}</span>
           </div>
         ))}
-        <div className="pt-4">
+        <div className="pt-4 mb-14">
           <h1 className="uppercase font-bold text-xs text-ch-grey dark:text-ch-dark-mode-neutral-100 pl-4 pr-3">
             Tags
           </h1>
-          {TagOption.map((tag) => (
-            <div className="pl-4 pr-3 flex justify-between items-center h-10 hover:bg-ch-light-mode-neutral-100 hover:text-black dark:hover:bg-ch-dark-mode-neutral-600 dark:hover:text-white text-ch-light-mode-neutral-800 dark:text-ch-dark-mode-neutral-100 rounded-lg cursor-pointer">
+          {TagOption.map((tag, index) => (
+            <div
+              key={index}
+              className="pl-4 pr-3 flex justify-between items-center h-10 hover:bg-ch-light-mode-neutral-100 hover:text-black dark:hover:bg-ch-dark-mode-neutral-600 dark:hover:text-white text-ch-light-mode-neutral-800 dark:text-ch-dark-mode-neutral-100 rounded-lg cursor-pointer"
+            >
               <div className="flex justify-center items-center gap-1.5">
                 <CustomCheckBox />
                 <h1 className=" font-semibold text-base">{tag.name}</h1>
