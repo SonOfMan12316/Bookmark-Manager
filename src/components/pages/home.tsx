@@ -1,12 +1,22 @@
-import { useState } from 'react'
+import { useState, useCallback } from 'react'
+import { useForm } from 'react-hook-form'
 import { Bookmark, sortOptions } from '../../data/bookmark'
 import { Checkmark, Switch } from '../icons'
 import Layout from '../layouts/layout'
-import { BookmarkCard, PopOver } from '../ui'
+import { BookmarkCard, Button, FormSection, Modal, PopOver } from '../ui'
+import useUIStore from '../../store/ui'
+import { BookmarkFields } from '../../configs/forms/bookmark'
 
 interface HeaderSectionProp {
   popOpen: boolean
   setPopOpen: (popOpen: boolean) => void
+}
+
+interface AddBookmarkForm {
+  title: string
+  description: string
+  websiteUrl: string
+  tags: string
 }
 
 const HeaderSection = ({ popOpen, setPopOpen }: HeaderSectionProp) => {
@@ -53,6 +63,21 @@ const SortOptions = () => {
 
 const Home = () => {
   const [popOpen, setPopOpen] = useState<boolean>(false)
+  const { isModalOpen, setIsModalOpen } = useUIStore()
+
+  const handleModalClose = useCallback(() => setIsModalOpen(false), [])
+
+  const {
+    register,
+    watch,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<AddBookmarkForm>({
+    mode: 'onChange',
+  })
+
+  const handleAddOrEditBookmark = () => {}
+
   return (
     <Layout>
       <HeaderSection popOpen={popOpen} setPopOpen={setPopOpen} />
@@ -61,6 +86,37 @@ const Home = () => {
           <BookmarkCard key={bookmark.id} bookmark={bookmark} />
         ))}
       </div>
+      <Modal
+        title="Add a Bookmark"
+        description="Save a link with details to keep your collection organized."
+        isOpen={isModalOpen}
+        defaultClose={true}
+        onClose={handleModalClose}
+      >
+        <form onSubmit={handleSubmit(handleAddOrEditBookmark)}>
+          <div className="pb-5">
+            <FormSection
+              fields={BookmarkFields()}
+              register={register}
+              errors={errors}
+              watch={watch}
+              variant="light"
+            />
+          </div>
+          <div className="flex gap-4 lg:justify-end">
+            <div>
+              <Button variant="neutral" onClick={handleModalClose}>
+                Cancel
+              </Button>
+            </div>
+            <div>
+              <Button type="submit" variant="primary">
+                Add Bookmark
+              </Button>
+            </div>
+          </div>
+        </form>
+      </Modal>
     </Layout>
   )
 }

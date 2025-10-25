@@ -10,3 +10,10 @@ export const passwordPattern = (fieldName = 'Password'): PatternValdation => {
     message: `${fieldName} must contain at least one number, one uppercase letter, one lowercase letter, and one special character`,
   }
 }
+
+export const fullNamePattern = (fieldName = 'Full name'): PatternValdation => {
+  return {
+    value: /^[A-Za-z]+([ '’-][A-Za-z]+)*$/,
+    message: `${fieldName} format is invalid`,
+  }
+}

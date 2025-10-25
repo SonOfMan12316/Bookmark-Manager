@@ -53,7 +53,7 @@ const Modal = ({
               {defaultClose && (
                 <button
                   onClick={onClose}
-                  className="p-1 absolute top-5 right-5 cursor-pointer flex items-center justify-center border-[1.45px] border-ch-light-mode-neutral-100 dark:border-ch-dark-mode-neutral-500 dark:text-white hover:bg-ch-light-mode-neutral-400 rounded-lg"
+                  className="p-1 absolute top-5 right-5 cursor-pointer flex items-center justify-center border-[1.45px] border-ch-light-mode-neutral-100 dark:border-ch-dark-mode-neutral-500 dark:text-white hover:bg-ch-light-mode-neutral-400 dark:hover:bg-ch-dark-mode-neutral-600 rounded-lg"
                 >
                   <div>
                     <Cancel />
