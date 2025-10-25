@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import {
   Avatar,
@@ -20,8 +20,10 @@ interface HeaderProps {
 const Header = ({ setShowSidenav }: HeaderProps) => {
   const [popOpen, setPopOpen] = useState<boolean>(false)
 
-  const { theme, setTheme } = useUIStore()
+  const { theme, setTheme, setIsModalOpen } = useUIStore()
   const navigate = useNavigate()
+
+  const handleModalOpen = useCallback(() => setIsModalOpen(true), [])
 
   return (
     <div className="bg-white dark:bg-ch-dark-mode-neutral-800 border-b-[1.45px] dark:border-b-ch-dark-mode-neutral-500 border-b-ch-light-mode-neutral-100 h-16 px-4 sm:px-8 py-3 sm:py-6 lg:py-9 flex items-center gap-2 flex-grow">
@@ -41,7 +43,11 @@ const Header = ({ setShowSidenav }: HeaderProps) => {
         </div>
       </div>
       <div className="flex items-center gap-2 sm:gap-4 flex-shrink-0">
-        <Button className="flex items-center justify-center" variant="primary">
+        <Button
+          onClick={handleModalOpen}
+          className="flex items-center justify-center"
+          variant="primary"
+        >
           <Plus />
           <span className="hidden sm:block text-base pl-1.5">Add Bookmark</span>
         </Button>
