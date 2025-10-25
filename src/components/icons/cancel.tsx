@@ -1,15 +1,15 @@
 const Cancel = ({ ...props }) => {
   return (
     <svg
-      width="32"
-      height="32"
-      viewBox="0 0 32 32"
+      width="20"
+      height="20"
+      viewBox="0 0 20 20"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
       {...props}
     >
       <path
-        d="M21 11L11 21M11 11L21 21"
+        d="M15 5L5 15M5 5L15 15"
         stroke="currentColor"
         strokeWidth="1.5"
         strokeLinecap="round"
