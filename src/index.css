@@ -24,6 +24,7 @@
   --color-ch-red-800: #cb0a04;
   --color-ch-grey: #4d4d4d;
   --color-ch-light-grey: #e9eaeb;
+  --color-ch-blur: #000000b3;
 
   --font-sans: 'Roboto', ui-sans-serif, system-ui, -apple-system, 'Segoe UI',
     sans-serif;
@@ -34,4 +35,35 @@
     font-family: 'Manrope', sans-serif;
     @apply transition-colors duration-300 ease-in-out;
   }
+}
+
+::-webkit-scrollbar {
+  width: 2px;
+  display: none;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: rgba(255, 255, 255, 0.15);
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: #fff;
+}
+
+* {
+  scrollbar-width: unset;
+  scrollbar-color: rgba(255, 255, 255, 0.15);
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }
