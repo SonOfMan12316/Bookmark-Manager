@@ -58,9 +58,14 @@ const FormSection = <T extends FieldValues>({
   errors,
   variant,
 }: FormSectionProps<T>) => {
-  const renderFields = (field: InputsInterface): ReactNode => {
+  const renderFields = (
+    field: InputsInterface,
+    hasError?: boolean,
+    fieldError?: unknown
+  ): ReactNode => {
     const { name, onHook, label, variant: fieldVariant, ...rest } = field
     const inputRegisterProps = register ? register(name, onHook) : {}
+    const errorId = `${String(name)}-error`
 
     const inputLabel = (
       <span className="text-black dark:text-white text-sm font-semibold flex items-center">
@@ -77,6 +82,9 @@ const FormSection = <T extends FieldValues>({
             label={inputLabel}
             variant={fieldVariant ?? variant}
             maxLength={280}
+            hasError={hasError}
+            aria-invalid={Boolean(fieldError)}
+            aria-describedby={fieldError ? errorId : undefined}
           />
         )
 
@@ -87,6 +95,9 @@ const FormSection = <T extends FieldValues>({
             {...inputRegisterProps}
             label={inputLabel}
             variant={fieldVariant ?? variant}
+            hasError={hasError}
+            aria-invalid={Boolean(fieldError)}
+            aria-describedby={fieldError ? errorId : undefined}
           />
         )
     }
@@ -98,15 +109,17 @@ const FormSection = <T extends FieldValues>({
     <div className="w-full">
       {fields?.map((field: InputsInterface) => {
         const fieldError = errors?.[field.name as keyof T]
+        const errorId = `${String(field.name)}-error`
 
         return (
           <div key={field.name} className="w-full pb-5">
-            {renderFields(field)}
+            {renderFields(field, Boolean(fieldError), fieldError)}
             <div className="flex flex-row justify-between items-center">
               {fieldError ? (
                 <span
+                  id={errorId}
                   role="alert"
-                  className="font-medium text-xs text-ch-red-600 dark:text-ch-red-800"
+                  className="font-medium text-xs text-ch-light-mode-neutral-800 dark:text-ch-dark-mode-neutral-100"
                 >
                   {typeof fieldError?.message === 'string'
                     ? fieldError.message

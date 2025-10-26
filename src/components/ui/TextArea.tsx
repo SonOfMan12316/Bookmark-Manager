@@ -15,6 +15,7 @@ export interface TextareaProps
   variant?: 'light' | 'search' | 'dark'
   required?: boolean
   disabled?: boolean
+  hasError?: boolean
 }
 
 const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
@@ -44,6 +45,10 @@ const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
           variant === 'light',
         'text-ch-light-mode-neutral-800 dark:text-ch-dark-mode-neutral-100 placeholder:text-ch-light-mode-neutral-800 dark:placeholder:text-ch-dark-mode-neutral-100 placeholder:text-base placeholder:font-medium bg-transparent':
           variant === 'light',
+      },
+      {
+        '!border-ch-red-800 dark:!border-ch-red-600': (props as TextareaProps)
+          .hasError,
       }
     )
 

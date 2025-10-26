@@ -16,6 +16,7 @@ interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   icon?: string | ReactNode
   placement?: 'start' | 'end'
   variant?: InputVariant
+  hasError?: boolean
   extraRef?: Ref<HTMLInputElement>
 }
 
@@ -50,6 +51,10 @@ const Input = forwardRef<HTMLInputElement, InputProps>((props, ref) => {
     {
       'bg-white dark:bg-ch-dark-mode-neutral-600 dark:border-ch-dark-mode-neutral-500 dark:hover:bg-ch-dark-mode-neutral-400 hover:bg-ch-light-mode-neutral-100 border border-ch-light-mode-neutral-300':
         variant === 'search',
+    },
+    {
+      '!border-ch-red-800 dark:!border-ch-red-600': (props as InputProps)
+        .hasError,
     }
   )
 
