@@ -12,20 +12,25 @@ import {
   Home,
 } from './components/pages'
 import { useThemeInitializer } from './hooks'
+import { ToastContainer, ToastNotificationProvider } from './components/Toast'
 
 const App = () => {
   useThemeInitializer()
   return (
-    <Router>
-      <Routes>
-        <Route path="/" element={<Navigate to="sign-in" />} />
-        <Route path="/sign-in" element={<SignIn />} />
-        <Route path="/sign-up" element={<SignUp />} />
-        <Route path="/forgot-password" element={<ForgotPassword />} />
-        <Route path="/reset-password" element={<ResetPassword />} />
-        <Route path="/home" element={<Home />} />
-      </Routes>
-    </Router>
+    <ToastNotificationProvider>
+      <Router>
+        <Routes>
+          <Route path="/" element={<Navigate to="sign-in" />} />
+          <Route path="/sign-in" element={<SignIn />} />
+          <Route path="/sign-up" element={<SignUp />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/reset-password" element={<ResetPassword />} />
+          <Route path="/home" element={<Home />} />
+        </Routes>
+      </Router>
+
+      <ToastContainer />
+    </ToastNotificationProvider>
   )
 }
 

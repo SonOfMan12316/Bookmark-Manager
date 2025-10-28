@@ -47,3 +47,17 @@ export interface InputsInterface {
   variant?: InputVariant
   readOnly?: boolean
 }
+
+export interface ToastNotification {
+  id: string
+  message: string
+  icon: ReactNode
+  duration?: number
+}
+
+export interface ActionItem {
+  icon: ReactNode
+  label: string
+  onClick?: () => void
+  href?: string
+}
