@@ -17,3 +17,15 @@ export const fullNamePattern = (fieldName = 'Full name'): PatternValdation => {
     message: `${fieldName} format is invalid`,
   }
 }
+
+export const ensureUrl = (url: string | undefined | null): string => {
+  if (!url || typeof url !== 'string' || url.trim() === '') {
+    return '#'
+  }
+  const trimmedUrl = url.trim()
+  if (/^[a-zA-Z][a-zA-Z\d+\-.]*:\/\//.test(trimmedUrl)) {
+    return trimmedUrl
+  }
+  const formattedUrl = `https://${trimmedUrl}`
+  return formattedUrl
+}

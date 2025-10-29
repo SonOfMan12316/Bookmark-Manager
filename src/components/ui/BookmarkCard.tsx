@@ -1,7 +1,20 @@
-import type { ReactNode } from 'react'
-import type { Bookmark } from '../../types/global'
-import { Calendar, Clock, Eye, Pin, VerticalDots } from '../icons'
+import { useState, type ReactNode } from 'react'
+import { type ActionItem, type Bookmark } from '../../types/global'
+import {
+  Calendar,
+  Clock,
+  Eye,
+  Pin,
+  VerticalDots,
+  Copy,
+  Edit,
+  External,
+  Archive,
+} from '../icons'
 import { formatUTC } from '../../utils/date'
+import Popover from './PopOver'
+import { ensureUrl } from '../../utils/validators'
+import { useNotification } from '../../hooks'
 
 interface BookmarkProp {
   bookmark: Bookmark
@@ -21,6 +34,36 @@ const Meta = ({ icon, label }: MetaProp) => {
 }
 
 const BookmarkCard = ({ bookmark }: BookmarkProp) => {
+  const [popOpen, setPopOpen] = useState(false)
+  const { addNotification } = useNotification()
+
+  const handleCopyUrl = async () => {
+    try {
+      await navigator.clipboard.writeText(bookmark.url)
+      addNotification({
+        id: 'copy-url-id',
+        message: 'Link copied to clipboard.',
+        icon: <Copy />,
+        duration: 5000,
+      })
+    } catch (error) {
+      addNotification({
+        id: 'copy-url-id',
+        icon: <Copy />,
+        message: 'Failed to copy link.',
+        duration: 5000,
+      })
+    }
+  }
+
+  const actions: ActionItem[] = [
+    { icon: <External />, label: 'Visit', href: ensureUrl(bookmark.url) },
+    { icon: <Copy />, label: 'Copy URL', onClick: handleCopyUrl },
+    { icon: <Pin />, label: 'Pin' },
+    { icon: <Edit />, label: 'Edit' },
+    { icon: <Archive />, label: 'Archive' },
+  ]
+
   return (
     <div
       key={bookmark.id}
@@ -44,9 +87,47 @@ const BookmarkCard = ({ bookmark }: BookmarkProp) => {
             </div>
           </div>
 
-          <div className="cursor-pointer h-8 w-8 flex items-center justify-center border-[1.45px] hover:bg-ch-light-mode-neutral-100 dark:hover:bg-ch-dark-mode-neutral-400/30 border-ch-light-mode-neutral-400 dark:border-ch-dark-mode-neutral-500 bg-white dark:bg-ch-dark-mode-neutral-800 rounded-lg">
-            <VerticalDots className="text-ch-light-mode-neutral-900 dark:text-white" />
-          </div>
+          <Popover
+            isOpen={popOpen}
+            setIsOpen={setPopOpen}
+            trigger={
+              <div className="cursor-pointer h-8 w-8 flex items-center justify-center border-[1.45px] hover:bg-ch-light-mode-neutral-100 dark:hover:bg-ch-dark-mode-neutral-400/30 border-ch-light-mode-neutral-400 dark:border-ch-dark-mode-neutral-500 bg-white dark:bg-ch-dark-mode-neutral-800 rounded-lg">
+                <VerticalDots className="text-ch-light-mode-neutral-900 dark:text-white" />
+              </div>
+            }
+            triggerVariant="naked"
+          >
+            <div className="p-2 w-[200px]">
+              {actions.map(({ icon, onClick, label, href }) => (
+                <div key={label} onClick={onClick}>
+                  <div className="flex items-center justify-start p-2 font-semibold text-sm cursor-pointer rounded-md dark:hover:bg-ch-dark-mode-neutral-500 hover:bg-ch-light-mode-neutral-100 text-ch-light-mode-neutral-800 dark:text-ch-dark-mode-neutral-100 dark:hover:text-white transition-colors w-full">
+                    {href ? (
+                      <a
+                        target="_blank"
+                        href={ensureUrl(bookmark.url)}
+                        rel="noopener noreferrer"
+                        className="flex items-center w-full"
+                      >
+                        <>
+                          <span className="w-6 flex-shrink-0 flex items-center hover:text-black">
+                            {icon}
+                          </span>
+                          <span className="truncate">{label}</span>
+                        </>
+                      </a>
+                    ) : (
+                      <>
+                        <span className="w-6 flex-shrink-0 flex items-center hover:text-black">
+                          {icon}
+                        </span>
+                        <span className="truncate">{label}</span>
+                      </>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </Popover>
         </div>
 
         <p className="my-4 font-medium text-sm text-ch-light-mode-neutral-800 dark:text-ch-dark-mode-neutral-100 leading-[150%] tracking-[1%]">
