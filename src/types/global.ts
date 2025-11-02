@@ -58,6 +58,13 @@ export interface ToastNotification {
 export interface ActionItem {
   icon: ReactNode
   label: string
-  onClick?: () => void
+  onClick?: (bookmark?: Bookmark) => void
   href?: string
+}
+
+export interface AddBookmarkForm {
+  title: string
+  description: string
+  url: string
+  tags: string
 }

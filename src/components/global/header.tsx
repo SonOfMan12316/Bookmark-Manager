@@ -20,10 +20,10 @@ interface HeaderProps {
 const Header = ({ setShowSidenav }: HeaderProps) => {
   const [popOpen, setPopOpen] = useState<boolean>(false)
 
-  const { theme, setTheme, setIsModalOpen } = useUIStore()
+  const { theme, setTheme, setModalType } = useUIStore()
   const navigate = useNavigate()
 
-  const handleModalOpen = useCallback(() => setIsModalOpen(true), [])
+  const handleModalOpen = useCallback(() => setModalType('add'), [])
 
   return (
     <div className="bg-white dark:bg-ch-dark-mode-neutral-800 border-b-[1.45px] dark:border-b-ch-dark-mode-neutral-500 border-b-ch-light-mode-neutral-100 h-16 px-4 sm:px-8 py-3 sm:py-6 lg:py-9 flex items-center gap-2 flex-grow">

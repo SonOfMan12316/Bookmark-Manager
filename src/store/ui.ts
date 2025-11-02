@@ -1,18 +1,22 @@
 import { create } from 'zustand'
 import { persist, createJSONStorage } from 'zustand/middleware'
+import type { AddBookmarkForm } from '../types/global'
 
 type Theme = 'light' | 'dark'
+type ModalType = 'add' | 'edit' | null
 
 type UI = {
   popoverState: boolean
-  isModalOpen: boolean
   theme: Theme
+  modalType: ModalType
+  selectedBookmark?: AddBookmarkForm | null
 }
 
 type Actions = {
   setPopOverState: (state: UI['popoverState']) => void
   setTheme: (newTheme: UI['theme']) => void
-  setIsModalOpen: (state: UI['isModalOpen']) => void
+  setModalType: (state: UI['modalType']) => void
+  setSelectedBookmark: (bookmark: AddBookmarkForm) => void
 }
 
 type UIActions = UI & Actions
@@ -23,9 +27,12 @@ const useUIStore = create<UIActions>()(
       popoverState: false,
       theme: 'light',
       isModalOpen: false,
+      modalType: null,
+      selectedBookmark: null,
       setPopOverState: (popoverState) => set({ popoverState }),
       setTheme: (theme) => set({ theme }),
-      setIsModalOpen: (isModalOpen) => set({ isModalOpen }),
+      setModalType: (modalType) => set({ modalType }),
+      setSelectedBookmark: (selectedBookmark) => set({ selectedBookmark }),
     }),
     {
       name: 'global-ui-storage',

@@ -1,5 +1,9 @@
 import { useState, type ReactNode } from 'react'
-import { type ActionItem, type Bookmark } from '../../types/global'
+import {
+  type ActionItem,
+  type Bookmark,
+  type AddBookmarkForm,
+} from '../../types/global'
 import {
   Calendar,
   Clock,
@@ -15,6 +19,7 @@ import { formatUTC } from '../../utils/date'
 import Popover from './PopOver'
 import { ensureUrl } from '../../utils/validators'
 import { useNotification } from '../../hooks'
+import useUIStore from '../../store/ui'
 
 interface BookmarkProp {
   bookmark: Bookmark
@@ -37,6 +42,8 @@ const BookmarkCard = ({ bookmark }: BookmarkProp) => {
   const [popOpen, setPopOpen] = useState(false)
   const { addNotification } = useNotification()
 
+  const { setModalType, setSelectedBookmark } = useUIStore()
+
   const handleCopyUrl = async () => {
     try {
       await navigator.clipboard.writeText(bookmark.url)
@@ -56,11 +63,20 @@ const BookmarkCard = ({ bookmark }: BookmarkProp) => {
     }
   }
 
+  const handleEdit = () => {
+    setSelectedBookmark(bookmark)
+    setModalType('edit')
+  }
+
   const actions: ActionItem[] = [
     { icon: <External />, label: 'Visit', href: ensureUrl(bookmark.url) },
     { icon: <Copy />, label: 'Copy URL', onClick: handleCopyUrl },
     { icon: <Pin />, label: 'Pin' },
-    { icon: <Edit />, label: 'Edit' },
+    {
+      icon: <Edit />,
+      label: 'Edit',
+      onClick: handleEdit,
+    },
     { icon: <Archive />, label: 'Archive' },
   ]
 
@@ -99,7 +115,10 @@ const BookmarkCard = ({ bookmark }: BookmarkProp) => {
           >
             <div className="p-2 w-[200px]">
               {actions.map(({ icon, onClick, label, href }) => (
-                <div key={label} onClick={onClick}>
+                <div
+                  key={label}
+                  onClick={onClick ? () => onClick(bookmark) : undefined}
+                >
                   <div className="flex items-center justify-start p-2 font-semibold text-sm cursor-pointer rounded-md dark:hover:bg-ch-dark-mode-neutral-500 hover:bg-ch-light-mode-neutral-100 text-ch-light-mode-neutral-800 dark:text-ch-dark-mode-neutral-100 dark:hover:text-white transition-colors w-full">
                     {href ? (
                       <a
