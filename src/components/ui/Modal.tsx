@@ -41,7 +41,7 @@ const Modal = ({
             role="dialog"
             aria-modal="true"
             aria-labelledby="modal-title"
-            className="fixed w-full h-full top-0 bottom-0 right-0 left-0 flex justify-center items-center bg-ch-blur"
+            className="fixed w-full h-full top-0 bottom-0 right-0 left-0 flex justify-center items-center bg-black/50"
             style={{ zIndex }}
           >
             <section
