@@ -1,22 +1,13 @@
 import { useState, useCallback } from 'react'
-import { useForm } from 'react-hook-form'
 import { Bookmark, sortOptions } from '../../data/bookmark'
 import { Checkmark, Switch } from '../icons'
 import Layout from '../layouts/layout'
-import { BookmarkCard, Button, FormSection, Modal, PopOver } from '../ui'
+import { BookmarkCard, BookmarkForm, Modal, PopOver } from '../ui'
 import useUIStore from '../../store/ui'
-import { BookmarkFields } from '../../configs/forms/bookmark'
 
 interface HeaderSectionProp {
   popOpen: boolean
   setPopOpen: (popOpen: boolean) => void
-}
-
-interface AddBookmarkForm {
-  title: string
-  description: string
-  websiteUrl: string
-  tags: string
 }
 
 const HeaderSection = ({ popOpen, setPopOpen }: HeaderSectionProp) => {
@@ -63,20 +54,9 @@ const SortOptions = () => {
 
 const Home = () => {
   const [popOpen, setPopOpen] = useState<boolean>(false)
-  const { isModalOpen, setIsModalOpen } = useUIStore()
-
-  const handleModalClose = useCallback(() => setIsModalOpen(false), [])
-
-  const {
-    register,
-    watch,
-    handleSubmit,
-    formState: { errors },
-  } = useForm<AddBookmarkForm>({
-    mode: 'onChange',
-  })
-
-  const handleAddOrEditBookmark = () => {}
+  const { modalType, setModalType } = useUIStore()
+  const handleModalClose = useCallback(() => setModalType(null), [])
+  const addModal = modalType === 'add'
 
   return (
     <Layout>
@@ -87,35 +67,22 @@ const Home = () => {
         ))}
       </div>
       <Modal
-        title="Add a Bookmark"
-        description="Save a link with details to keep your collection organized."
-        isOpen={isModalOpen}
-        defaultClose={true}
+        title={addModal ? 'Add a Bookmark' : 'Edit Bookmark'}
+        description={
+          addModal
+            ? 'Save a link with details to keep your collection organized.'
+            : 'Update your saved link details — change the title, description, URL, or tags anytime.'
+        }
+        isOpen={!!modalType}
         onClose={handleModalClose}
+        defaultClose={true}
       >
-        <form onSubmit={handleSubmit(handleAddOrEditBookmark)}>
-          <div className="pb-5">
-            <FormSection
-              fields={BookmarkFields()}
-              register={register}
-              errors={errors}
-              watch={watch}
-              variant="light"
-            />
-          </div>
-          <div className="flex gap-4 lg:justify-end">
-            <div>
-              <Button variant="neutral" onClick={handleModalClose}>
-                Cancel
-              </Button>
-            </div>
-            <div>
-              <Button type="submit" variant="primary">
-                Add Bookmark
-              </Button>
-            </div>
-          </div>
-        </form>
+        {modalType && (
+          <BookmarkForm
+            mode={modalType}
+            onClose={handleModalClose}
+          ></BookmarkForm>
+        )}
       </Modal>
     </Layout>
   )
