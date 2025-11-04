@@ -66,5 +66,5 @@ export interface AddBookmarkForm {
   title: string
   description: string
   url: string
-  tags: string
+  tags: string[]
 }
