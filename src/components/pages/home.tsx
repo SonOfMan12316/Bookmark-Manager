@@ -2,7 +2,8 @@ import { useState, useCallback } from 'react'
 import { Bookmark, sortOptions } from '../../data/bookmark'
 import { Checkmark, Switch } from '../icons'
 import Layout from '../layouts/layout'
-import { BookmarkCard, BookmarkForm, Modal, PopOver } from '../ui'
+import { PopOver, Modal } from '../ui'
+import { BookmarkCard, BookmarkForm } from '../Bookmark'
 import useUIStore from '../../store/ui'
 
 interface HeaderSectionProp {
@@ -21,7 +22,7 @@ const HeaderSection = ({ popOpen, setPopOpen }: HeaderSectionProp) => {
       <div>
         <PopOver
           trigger={
-            <div className="px-3 h-10.5 bg-white rounded-lg dark:bg-ch-dark-mode-neutral-800 text-ch-dark-mode-neutral-900 dark:text-white border-[1.45px] border-ch-light-mode-neutral-400 dark:border-ch-dark-mode-neutral-500 hover:bg-ch-light-mode-neutral-100 dark:hover:bg-ch-dark-mode-neutral-600 flex items-center gap-2">
+            <div className="px-3 h-10.5 bg-white rounded-lg dark:bg-ch-dark-mode-neutral-800 text-ch-dark-mode-neutral-900 dark:text-white border border-ch-light-mode-neutral-400 dark:border-ch-dark-mode-neutral-500 hover:bg-ch-light-mode-neutral-100 dark:hover:bg-ch-dark-mode-neutral-600 flex items-center gap-2">
               <Switch />
               <span>Sort By</span>
             </div>
