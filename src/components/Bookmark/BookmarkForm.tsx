@@ -1,28 +1,33 @@
 import { useForm } from 'react-hook-form'
 import { useEffect } from 'react'
-import { Button, FormSection } from '.'
+import { Button, FormSection } from '../ui'
 import { BookmarkFields } from '../../configs/forms/bookmark'
 import { type AddBookmarkForm } from '../../types/global'
 import useUIStore from '../../store/ui'
+import { useNotification } from '../../hooks'
+import { Checkmark } from '../icons'
+
+type Mode = 'add' | 'edit'
 
 interface BookmarkFormProps {
-  mode: 'add' | 'edit'
+  mode: Mode
   onClose: () => void
 }
 
 const BookmarkForm = ({ mode, onClose }: BookmarkFormProps) => {
   const { selectedBookmark } = useUIStore()
+  const { addNotification } = useNotification()
 
   const {
     register,
     handleSubmit,
     formState: { errors },
     watch,
-    setValue
+    setValue,
   } = useForm<AddBookmarkForm>()
 
   useEffect(() => {
-    if(selectedBookmark && mode === 'edit') {
+    if (selectedBookmark && mode === 'edit') {
       setValue('title', selectedBookmark.title)
       setValue('description', selectedBookmark.description)
       setValue('url', selectedBookmark.url)
@@ -36,6 +41,24 @@ const BookmarkForm = ({ mode, onClose }: BookmarkFormProps) => {
     }
 
     onClose()
+  }
+
+  const showToast = (mode: Mode) => {
+    if (mode === 'add') {
+      addNotification({
+        id: 'add-bookmark-id',
+        message: 'Bookmark added successfully.',
+        icon: <Checkmark />,
+        duration: 5000,
+      })
+    } else {
+      addNotification({
+        id: 'add-bookmark-id',
+        message: 'Changes saved.',
+        icon: <Checkmark />,
+        duration: 5000,
+      })
+    }
   }
 
   return (
@@ -54,7 +77,7 @@ const BookmarkForm = ({ mode, onClose }: BookmarkFormProps) => {
         <Button variant="neutral" onClick={onClose} type="button">
           Cancel
         </Button>
-        <Button type="submit" variant="primary">
+        <Button type="submit" onClick={() => showToast(mode)} variant="primary">
           {mode === 'add' ? 'Add Bookmark' : 'Save Bookmark'}
         </Button>
       </div>

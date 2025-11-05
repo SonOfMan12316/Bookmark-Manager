@@ -12,7 +12,7 @@ import {
   Archive,
 } from '../icons'
 import { formatUTC } from '../../utils/date'
-import Popover from './PopOver'
+import { PopOver } from '../ui'
 import { ensureUrl } from '../../utils/validators'
 import { useNotification } from '../../hooks'
 import useUIStore from '../../store/ui'
@@ -59,6 +59,24 @@ const BookmarkCard = ({ bookmark }: BookmarkProp) => {
     }
   }
 
+  const handlePin = () => {
+    addNotification({
+      id: 'pin-bookmark-id',
+      message: 'Bookmark pinned to top.',
+      icon: <Pin />,
+      duration: 5000,
+    })
+  }
+
+  const handleArchive = () => {
+    addNotification({
+      id: 'archive-bookmark-id',
+      message: 'Bookmark archived',
+      icon: <Archive />,
+      duration: 5000,
+    })
+  }
+
   const handleEdit = () => {
     setSelectedBookmark(bookmark)
     setModalType('edit')
@@ -67,13 +85,13 @@ const BookmarkCard = ({ bookmark }: BookmarkProp) => {
   const actions: ActionItem[] = [
     { icon: <External />, label: 'Visit', href: ensureUrl(bookmark.url) },
     { icon: <Copy />, label: 'Copy URL', onClick: handleCopyUrl },
-    { icon: <Pin />, label: 'Pin' },
+    { icon: <Pin />, label: 'Pin', onClick: handlePin },
     {
       icon: <Edit />,
       label: 'Edit',
       onClick: handleEdit,
     },
-    { icon: <Archive />, label: 'Archive' },
+    { icon: <Archive />, label: 'Archive', onClick: handleArchive },
   ]
 
   return (
@@ -99,11 +117,11 @@ const BookmarkCard = ({ bookmark }: BookmarkProp) => {
             </div>
           </div>
 
-          <Popover
+          <PopOver
             isOpen={popOpen}
             setIsOpen={setPopOpen}
             trigger={
-              <div className="cursor-pointer h-8 w-8 flex items-center justify-center border-[1.45px] hover:bg-ch-light-mode-neutral-100 dark:hover:bg-ch-dark-mode-neutral-400/30 border-ch-light-mode-neutral-400 dark:border-ch-dark-mode-neutral-500 bg-white dark:bg-ch-dark-mode-neutral-800 rounded-lg">
+              <div className="cursor-pointer h-8 w-8 flex items-center justify-center border-[1px] hover:bg-ch-light-mode-neutral-100 dark:hover:bg-ch-dark-mode-neutral-400/30 border-ch-light-mode-neutral-400 dark:border-ch-dark-mode-neutral-500 bg-white dark:bg-ch-dark-mode-neutral-800 rounded-lg">
                 <VerticalDots className="text-ch-light-mode-neutral-900 dark:text-white" />
               </div>
             }
@@ -142,7 +160,7 @@ const BookmarkCard = ({ bookmark }: BookmarkProp) => {
                 </div>
               ))}
             </div>
-          </Popover>
+          </PopOver>
         </div>
 
         <p className="my-4 font-medium text-sm text-ch-light-mode-neutral-800 dark:text-ch-dark-mode-neutral-100 leading-[150%] tracking-[1%]">
