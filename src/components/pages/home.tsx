@@ -1,10 +1,11 @@
-import { useState, useCallback } from 'react'
-import { Bookmark, sortOptions } from '../../data/bookmark'
+import { useState, useCallback, useMemo } from 'react'
+import { sortOptions } from '../../data/bookmark'
 import { Checkmark, Switch } from '../icons'
 import Layout from '../layouts/layout'
 import { PopOver, Modal } from '../ui'
 import { BookmarkCard, BookmarkForm } from '../Bookmark'
 import useUIStore from '../../store/ui'
+import { useBookmarksStore } from '../../store'
 
 interface HeaderSectionProp {
   popOpen: boolean
@@ -56,6 +57,9 @@ const SortOptions = () => {
 const Home = () => {
   const [popOpen, setPopOpen] = useState<boolean>(false)
   const { modalType, setModalType } = useUIStore()
+  const { bookmarks, filter, searchQuery, getFilteredBookmarks } = useBookmarksStore()
+  const filteredBookmarks = useMemo(() => getFilteredBookmarks(), [bookmarks, filter, searchQuery, getFilteredBookmarks])
+  
   const handleModalClose = useCallback(() => setModalType(null), [])
   const addModal = modalType === 'add'
 
@@ -63,7 +67,7 @@ const Home = () => {
     <Layout>
       <HeaderSection popOpen={popOpen} setPopOpen={setPopOpen} />
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-        {Bookmark.map((bookmark) => (
+        {filteredBookmarks.map((bookmark) => (
           <BookmarkCard key={bookmark.id} bookmark={bookmark} />
         ))}
       </div>

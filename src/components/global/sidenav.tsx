@@ -3,12 +3,14 @@ import { Archive, Cancel, Home, Logo } from '../icons'
 import { CustomCheckBox } from '../ui'
 import { TagOption } from '../../data/bookmark'
 import { useClickOutside } from '../../hooks'
+import { useBookmarksStore } from '../../store'
 
 type Categorylabel = 'Home' | 'Archive'
 
 interface CategoryOption {
   label: Categorylabel
   icon: ReactNode
+  onClick?: (filter: 'archived' | 'all') => void
 }
 
 const CategoryOptions: CategoryOption[] = [
@@ -28,6 +30,7 @@ interface SidenavProp {
 }
 
 const SideNav = ({ showSidenav, setShowSidenav }: SidenavProp) => {
+  const { setFilter } = useBookmarksStore()
   const [activeCategory, setActveCategory] = useState<Categorylabel>('Home')
 
   const sideNavRef = useClickOutside(() => {
@@ -67,7 +70,10 @@ const SideNav = ({ showSidenav, setShowSidenav }: SidenavProp) => {
                 ? 'bg-ch-light-mode-neutral-100 dark:bg-ch-dark-mode-neutral-600 text-black dark:text-white'
                 : 'text-ch-light-mode-neutral-800 dark:text-ch-dark-mode-neutral-100'
             }`}
-            onClick={() => setActveCategory(category.label)}
+            onClick={() => {
+              setFilter(category.label === 'Archive' ? 'archived' : 'all')
+              setActveCategory(category.label)
+            }}
             key={index}
           >
             {category.icon}
