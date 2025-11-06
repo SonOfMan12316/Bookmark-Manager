@@ -15,7 +15,7 @@ import { formatUTC } from '../../utils/date'
 import { PopOver } from '../ui'
 import { ensureUrl } from '../../utils/validators'
 import { useNotification } from '../../hooks'
-import useUIStore from '../../store/ui'
+import { useUIStore } from '../../store'
 
 interface BookmarkProp {
   bookmark: Bookmark
