@@ -59,23 +59,41 @@ const BookmarkCard = ({ bookmark }: BookmarkProp) => {
     }
   }
 
-  const handlePin = () => {
-    addNotification({
-      id: 'pin-bookmark-id',
-      message: 'Bookmark pinned to top.',
-      icon: <Pin />,
-      duration: 5000,
-    })
+  const handlePin = (bookmark: Bookmark) => {
+    if(bookmark.pinned) {
+      addNotification({
+        id: 'un-pin-bookmark-id',
+        message: 'Bookmark unpinned.',
+        icon: <Pin />,
+        duration: 5000,
+      })
+    } else {
+      addNotification({
+        id: 'pin-bookmark-id',
+        message: 'Bookmark pinned to top.',
+        icon: <Pin />,
+        duration: 5000,
+      })
+    }
   }
 
-  const handleArchive = () => {
+  const handleArchive = (bookmark: Bookmark) => {
+    if(bookmark.isArchived) {
+      addNotification({
+        id: 'archive-bookmark-id',
+        message: 'Bookmark unarchived.',
+        icon: <Archive />,
+        duration: 5000,
+      })
+    } else {
     addNotification({
       id: 'archive-bookmark-id',
-      message: 'Bookmark archived',
+      message: 'Bookmark archived.',
       icon: <Archive />,
       duration: 5000,
     })
   }
+}
 
   const handleEdit = () => {
     setSelectedBookmark(bookmark)
@@ -85,13 +103,13 @@ const BookmarkCard = ({ bookmark }: BookmarkProp) => {
   const actions: ActionItem[] = [
     { icon: <External />, label: 'Visit', href: ensureUrl(bookmark.url) },
     { icon: <Copy />, label: 'Copy URL', onClick: handleCopyUrl },
-    { icon: <Pin />, label: 'Pin', onClick: handlePin },
+    { icon: <Pin />, label: bookmark.pinned ? 'Unpin' : 'Pin', onClick: () => handlePin(bookmark) },
     {
       icon: <Edit />,
       label: 'Edit',
       onClick: handleEdit,
     },
-    { icon: <Archive />, label: 'Archive', onClick: handleArchive },
+    { icon: <Archive />, label: bookmark.isArchived ? 'Unarchive' : 'Archive', onClick: () => handleArchive(bookmark) },
   ]
 
   return (
@@ -194,7 +212,7 @@ const BookmarkCard = ({ bookmark }: BookmarkProp) => {
           </div>
         </div>
         <div>
-          <Pin />
+          { bookmark.pinned && <Pin /> }
         </div>
       </div>
     </div>
