@@ -1,4 +1,9 @@
-const CustomCheckBox = () => {
+interface CustomCheckboxProps {
+  onChange: () => void
+  checked: boolean
+}
+
+const CustomCheckBox = ({ onChange, checked }: CustomCheckboxProps) => {
   return (
     <div className="relative inline-block">
       <input
@@ -11,6 +16,8 @@ const CustomCheckBox = () => {
          dark:checked:bg-ch-teal-700 dark:checked:border-ch-dark-mode-neutral-400 dark:checked:hover:bg-ch-teal-800
            dark:focus:outline-3 dark:focus:outline-ch-dark-neutral-800 dark:focus:ring-5 dark:focus:ring-ch-dark-mode-neutral-100
            peer"
+        onChange={onChange}
+        checked={checked}
       />
       <svg
         className="absolute left-0 top-2 hidden peer-checked:block pointer-events-none"
