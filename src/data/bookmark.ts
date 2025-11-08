@@ -276,7 +276,7 @@ export const TagOption: Tag[] = [
 ]
 
 export const sortOptions = [
-  { label: 'Recently Added', value: 'recent', selected: 'true' },
-  { label: 'Recently Visited', value: 'visited' },
-  { label: 'Most Visited', value: 'most' },
+  { label: 'Recently Added', value: 'recently-added', selected: 'true' },
+  { label: 'Recently Visited', value: 'recently-visited' },
+  { label: 'Most Visited', value: 'most-visited' },
 ]

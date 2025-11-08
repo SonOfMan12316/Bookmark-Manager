@@ -68,3 +68,7 @@ export interface AddBookmarkForm {
   url: string
   tags: string[]
 }
+
+export type BookmarkFilter = 'all' | 'archived'
+
+export type SortBy = 'recently-added' | 'recently-visited' | 'most-visited'
