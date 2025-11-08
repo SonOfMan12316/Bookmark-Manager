@@ -12,6 +12,7 @@ import {
 } from '../icons'
 import { Button, Input, PopOver } from '../ui'
 import useUIStore from '../../store/ui'
+import { useBookmarksStore } from '../../store'
 
 interface HeaderProps {
   setShowSidenav: (showSidenav: boolean) => void
@@ -21,6 +22,7 @@ const Header = ({ setShowSidenav }: HeaderProps) => {
   const [popOpen, setPopOpen] = useState<boolean>(false)
 
   const { theme, setTheme, setModalType } = useUIStore()
+  const { setSearchQuery } = useBookmarksStore()
   const navigate = useNavigate()
 
   const handleModalOpen = useCallback(() => setModalType('add'), [])
@@ -38,6 +40,7 @@ const Header = ({ setShowSidenav }: HeaderProps) => {
             placement="start"
             icon={<Search />}
             variant="search"
+            onChange={(event) => setSearchQuery(event.target.value)}
             className="w-full dark:text-ch-dark-mode-neutral-100 text-ch-light-mode-neutral-800"
           />
         </div>

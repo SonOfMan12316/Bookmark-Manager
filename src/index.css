@@ -25,6 +25,8 @@
   --color-ch-grey: #4d4d4d;
   --color-ch-light-grey: #e9eaeb;
   --color-ch-blur: #000000b3;
+  --color-ch-lighter-grey: #595454;
+  --color-ch-lightest-grey: #d9d9d9;
 
   --font-sans: 'Roboto', ui-sans-serif, system-ui, -apple-system, 'Segoe UI',
     sans-serif;
