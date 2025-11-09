@@ -12,6 +12,7 @@ interface ModalProps {
   onClose?: () => void
   defaultClose?: boolean
   zIndex?: number
+  isDialog?: boolean
 }
 
 const Modal = ({
@@ -23,6 +24,7 @@ const Modal = ({
   onClose,
   defaultClose,
   zIndex = 40,
+  isDialog,
 }: ModalProps) => {
   const modalRef = useRef<HTMLDialogElement>(null)
 
@@ -47,10 +49,14 @@ const Modal = ({
             <section
               className={classnames(
                 className,
-                'relative bg-white dark:bg-ch-dark-mode-neutral-800 dark:border-[1.45px] dark:border-ch-dark-mode-neutral-500 py-6 px-4 sm:py-8 w-full max-w-[90%] sm:max-w-[570px] max-h-[85vh] rounded-xl'
+                `relative bg-white dark:bg-ch-dark-mode-neutral-800 dark:border-[1.45px] dark:border-ch-dark-mode-neutral-500 ${
+                  isDialog
+                    ? 'p-4 sm:p-6 sm:max-w-[450px]'
+                    : 'px-4 py-6 sm:py-8 sm:max-w-[570px] max-h-[85vh]'
+                } w-full  max-w-[90%] rounded-xl`
               )}
             >
-              {defaultClose && (
+              {defaultClose ? (
                 <button
                   type="button"
                   aria-label={title ? `Close ${title}` : 'Close dialog'}
@@ -61,11 +67,24 @@ const Modal = ({
                     <Cancel />
                   </div>
                 </button>
+              ) : (
+                <Cancel
+                  onClick={onClose}
+                  className="absolute top-2 right-2 sm:top-4.5 sm:right-4.5 z-20 cursor-pointer"
+                />
               )}
               <div className="w-full lg:px-2 max-h-[75vh] flex flex-col">
-                <div className="sticky top-0 z-10 pb-8 px-2">
+                <div
+                  className={`sticky top-0 z-10 ${
+                    isDialog ? 'pb-1' : 'pb-8 px-2'
+                  }`}
+                >
                   {title && (
-                    <h2 className="font-bold text-2xl text-black dark:text-white">
+                    <h2
+                      className={`font-bold text-2xl text-black dark:text-white ${
+                        isDialog ? 'sm:pb-1' : ''
+                      }`}
+                    >
                       {title}
                     </h2>
                   )}
@@ -75,7 +94,11 @@ const Modal = ({
                     </span>
                   )}
                 </div>
-                <div className="w-full px-2 pb-1.5 overflow-y-auto custom-scrollbar">
+                <div
+                  className={`w-full pb-1.5 ${
+                    isDialog ? '' : 'px-2'
+                  } overflow-y-auto custom-scrollbar`}
+                >
                   {children}
                 </div>
               </div>

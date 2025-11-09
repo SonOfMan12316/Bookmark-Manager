@@ -14,8 +14,8 @@ type UI = {
 
 type Actions = {
   setPopOverState: (state: UI['popoverState']) => void
-  setTheme: (newTheme: UI['theme']) => void
   setModalType: (state: UI['modalType']) => void
+  setTheme: (newTheme: UI['theme']) => void
   setSelectedBookmark: (bookmark: AddBookmarkForm) => void
 }
 
