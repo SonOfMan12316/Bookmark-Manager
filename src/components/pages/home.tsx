@@ -23,16 +23,17 @@ interface SortOptionsProp {
   setSortBy: (sortBy: SortBy) => void
 }
 
-const HeaderSection = ({ popOpen, setPopOpen, filter, searchQuery, sortBy, setSortBy, selectedTags }: HeaderSectionProp) => {
+const HeaderSection = ({popOpen, setPopOpen, filter, searchQuery, sortBy, setSortBy, selectedTags}: HeaderSectionProp) => {
   const HeaderTitle = useMemo(() => {
-    if(filter === 'archived' && !searchQuery && selectedTags.length === 0) return 'Archived Bookmarks'
+    if (filter === 'archived' && !searchQuery && selectedTags.length === 0)
+      return 'Archived Bookmarks'
     if(searchQuery) {
       return (
         <>
-        Results for: 
-        <span className="text-ch-teal-700 dark:text-ch-dark-mode-neutral-100">
-          "{searchQuery}"
-        </span> 
+          Results for: 
+          <span className="text-ch-teal-700 dark:text-ch-dark-mode-neutral-100">
+            "{searchQuery}"
+          </span> 
         </>
       )
     }
@@ -40,7 +41,6 @@ const HeaderSection = ({ popOpen, setPopOpen, filter, searchQuery, sortBy, setSo
       const tags = selectedTags.length <= 3
         ? selectedTags.join(', ')
         : `${selectedTags.slice(0, 3).join(', ')}...`;
-      
       return (
         <>
           Bookmarks tagged: 
@@ -112,13 +112,20 @@ const Home = () => {
     () => getFilteredBookmarks(),
     [bookmarks, filter, searchQuery, selectedTags, getFilteredBookmarks, sortBy]
   )
-  
   const handleModalClose = useCallback(() => setModalType(null), [])
   const addModal = modalType === 'add'
 
   return (
     <Layout>
-      <HeaderSection popOpen={popOpen} setPopOpen={setPopOpen} filter={filter} searchQuery={searchQuery} sortBy={sortBy} setSortBy={setSortBy} selectedTags={selectedTags} />
+      <HeaderSection
+        popOpen={popOpen}
+        setPopOpen={setPopOpen}
+        filter={filter}
+        searchQuery={searchQuery}
+        sortBy={sortBy}
+        setSortBy={setSortBy}
+        selectedTags={selectedTags}
+      />
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
         {filteredBookmarks.length > 0 ? (
           filteredBookmarks.map((bookmark) => (
