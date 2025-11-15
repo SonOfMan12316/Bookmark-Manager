@@ -39,8 +39,8 @@ const ConfirmDialog = (props: ConfirmDialogProps) => {
             {message}
           </h1>
         </div>
-        <div className="flex mt-4 sm:mt-6 justify-center sm:justify-end">
-          <div className="flex w-full flex-col gap-3 sm:flex-row sm:gap-4 sm:w-auto">
+        <div className="flex mt-4 sm:mt-6 ju justify-center sm:justify-end pr-2">
+          <div className="flex w-full gap-3 sm:gap-4 sm:w-auto">
             <Button
               className="w-full sm:w-auto"
               variant="neutral"
