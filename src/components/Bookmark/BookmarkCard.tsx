@@ -10,9 +10,11 @@ import {
   Edit,
   External,
   Archive,
+  Trash,
+  Refresh,
 } from '../icons'
 import { formatUTC } from '../../utils/date'
-import { PopOver } from '../ui'
+import { PopOver, Dialog } from '../ui'
 import { ensureUrl } from '../../utils/validators'
 import { useNotification } from '../../hooks'
 import { useUIStore } from '../../store'
@@ -26,6 +28,11 @@ interface MetaProp {
   label: string | number
 }
 
+interface DialogState {
+  open: boolean
+  action: 'archive' | 'unarchive' | 'delete'
+}
+
 const Meta = ({ icon, label }: MetaProp) => {
   return (
     <div className="flex items-center gap-1.5">
@@ -36,6 +43,10 @@ const Meta = ({ icon, label }: MetaProp) => {
 
 const BookmarkCard = ({ bookmark }: BookmarkProp) => {
   const [popOpen, setPopOpen] = useState(false)
+  const [dialogState, setDialogState] = useState<DialogState>({
+    open: false,
+    action: bookmark.isArchived ? 'unarchive' : 'archive',
+  })
   const { addNotification } = useNotification()
 
   const { setModalType, setSelectedBookmark } = useUIStore()
@@ -77,40 +88,99 @@ const BookmarkCard = ({ bookmark }: BookmarkProp) => {
     }
   }
 
-  const handleArchive = (bookmark: Bookmark) => {
-    if(bookmark.isArchived) {
+  const openArchiveDialog = () => {
+    setDialogState({
+      open: true,
+      action: bookmark.isArchived ? 'unarchive' : 'archive',
+    })
+  }
+
+  const openDeleteDialog = () => {
+    setDialogState({
+      open: true,
+      action: 'delete',
+    })
+  }
+
+  const closeDialog = () =>
+    setDialogState((prev) => ({
+      ...prev,
+      open: false,
+    }))
+
+  const handleDialogConfirm = () => {
+    if (dialogState.action === 'delete') {
+      addNotification({
+        id: 'delete-bookmark-id',
+        message: 'Bookmark deleted.',
+        icon: <Trash />,
+        duration: 5000,
+      })
+    } else if (dialogState.action === 'archive') {
       addNotification({
         id: 'archive-bookmark-id',
-        message: 'Bookmark unarchived.',
+        message: 'Bookmark archived.',
         icon: <Archive />,
         duration: 5000,
       })
     } else {
-    addNotification({
-      id: 'archive-bookmark-id',
-      message: 'Bookmark archived.',
-      icon: <Archive />,
-      duration: 5000,
-    })
+      addNotification({
+        id: 'archive-bookmark-id',
+        message: 'Bookmark restored.',
+        icon: <Refresh />,
+        duration: 5000,
+      })
+    }
+
+    closeDialog()
   }
-}
+
+  const dialogCopy = (() => {
+    if (dialogState.action === 'delete') {
+      return {
+        title: 'Delete bookmark',
+        message: 'Are you sure you want to delete this bookmark?',
+        confirmText: 'Delete permanently',
+        confirmVariant: 'remove' as const,
+      }
+    }
+
+    if (dialogState.action === 'unarchive') {
+      return {
+        title: 'Unarchive bookmark',
+        message: 'Move this bookmark back to your active list?',
+        confirmText: 'Unarchive',
+      }
+    }
+
+    return {
+      title: 'Archive bookmark',
+      message: 'Are you sure you want to archive this bookmark?',
+      confirmText: 'Archive',
+    }
+  })()
 
   const handleEdit = () => {
     setSelectedBookmark(bookmark)
     setModalType('edit')
   }
 
-  const actions: ActionItem[] = [
+  const activeActions: ActionItem[] = [
     { icon: <External />, label: 'Visit', href: ensureUrl(bookmark.url) },
     { icon: <Copy />, label: 'Copy URL', onClick: handleCopyUrl },
     { icon: <Pin />, label: bookmark.pinned ? 'Unpin' : 'Pin', onClick: () => handlePin(bookmark) },
-    {
-      icon: <Edit />,
-      label: 'Edit',
-      onClick: handleEdit,
-    },
-    { icon: <Archive />, label: bookmark.isArchived ? 'Unarchive' : 'Archive', onClick: () => handleArchive(bookmark) },
+    { icon: <Edit />, label: 'Edit', onClick: handleEdit },
+    { icon: <Archive />, label: 'Archive', onClick: openArchiveDialog },
   ]
+
+  const archivedActions: ActionItem[] = [
+    { icon: <External />, label: 'Visit', href: ensureUrl(bookmark.url) },
+    { icon: <Copy />, label: 'Copy URL', onClick: handleCopyUrl },
+    { icon: <Refresh />, label: 'Unarchive', onClick: openArchiveDialog },
+    { icon: <Trash />, label: 'Delete Permanently', onClick: openDeleteDialog },
+  ]
+
+  const actions = bookmark.isArchived ? archivedActions : activeActions
 
   return (
     <div
@@ -198,6 +268,15 @@ const BookmarkCard = ({ bookmark }: BookmarkProp) => {
           ))}
         </div>
       </div>
+      <Dialog
+        isOpen={dialogState.open}
+        title={dialogCopy.title}
+        message={dialogCopy.message}
+        confirmText={dialogCopy.confirmText}
+        confirmVariant={dialogCopy.confirmVariant}
+        onCancel={closeDialog}
+        handleConfirm={handleDialogConfirm}
+      />
 
       <div className="pt-4 -mx-4 border-b-[1.45px] border-b-ch-light-mode-neutral-100 dark:border-b-ch-dark-mode-neutral-500"></div>
       <div className="pt-3 flex justify-between items-center font-medium text-xs text-ch-light-mode-neutral-800 dark:text-ch-dark-mode-neutral-100">
@@ -211,9 +290,7 @@ const BookmarkCard = ({ bookmark }: BookmarkProp) => {
             <Meta icon={<Calendar />} label={formatUTC(bookmark.createdAt)} />
           </div>
         </div>
-        <div>
-          { bookmark.pinned && <Pin /> }
-        </div>
+        <div>{bookmark.pinned && <Pin />}</div>
       </div>
     </div>
   )
