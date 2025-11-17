@@ -3,7 +3,7 @@ import { sortOptions } from '../../data/bookmark'
 import { Checkmark, Switch } from '../icons'
 import Layout from '../layouts/layout'
 import { PopOver, Modal } from '../ui'
-import { BookmarkCard, BookmarkForm } from '../Bookmark'
+import { BookmarkCard, BookmarkForm } from '../bookmark'
 import useUIStore from '../../store/ui'
 import { useBookmarksStore } from '../../store'
 import type { BookmarkFilter, SortBy } from '../../types/global'
@@ -138,7 +138,7 @@ const Home = () => {
                 No bookmarks found
               </span>
               {(searchQuery || selectedTags.length > 0) && (
-                <span className="text-sm font-medium text-ch-light-mode-neutral-600 dark:text-ch-dark-mode-neutral-200">
+                <span className="text-sm font-medium text-ch-light-mode-neutral-600 dark:text-white">
                   Try adjusting your search or tag filters.
                 </span>
               )}

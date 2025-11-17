@@ -63,14 +63,14 @@ const Modal = ({
                   onClick={onClose}
                   className="p-1 absolute top-5 right-5 z-20 cursor-pointer flex items-center justify-center border-[1.45px] border-ch-light-mode-neutral-100 dark:border-ch-dark-mode-neutral-500 dark:text-white hover:bg-ch-light-mode-neutral-400 dark:hover:bg-ch-dark-mode-neutral-600 rounded-lg"
                 >
-                  <div>
+                  <div className='dark:text-white'>
                     <Cancel />
                   </div>
                 </button>
               ) : (
                 <Cancel
                   onClick={onClose}
-                  className="absolute top-2 right-2 sm:top-4.5 sm:right-4.5 z-20 cursor-pointer"
+                  className="absolute top-2 right-2 sm:top-4.5 sm:right-4.5 z-20 cursor-pointer dark:text-white"
                 />
               )}
               <div className="w-full lg:px-2 max-h-[75vh] flex flex-col">

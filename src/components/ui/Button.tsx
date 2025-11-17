@@ -54,7 +54,7 @@ const Button = forwardRef(
               variant === 'secondary',
           },
           {
-            'py-2.5 px-2 bg-ch-red-800 text-white focus-within:outline-3 focus-within:outline-white focus-within:ring-5 focus-within:ring-ch-red-800':
+            'py-2.5 px-2 bg-ch-red-800 shadow-2xl text-white focus-within:outline-3 border-none focus-within:outline-white focus-within:ring-5 focus-within:ring-ch-red-800':
               variant === 'remove',
           },
           {

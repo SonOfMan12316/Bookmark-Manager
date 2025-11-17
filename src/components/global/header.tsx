@@ -13,6 +13,7 @@ import {
 import { Button, Input, PopOver } from '../ui'
 import useUIStore from '../../store/ui'
 import { useBookmarksStore } from '../../store'
+import { useNotification } from '../../hooks'
 
 interface HeaderProps {
   setShowSidenav: (showSidenav: boolean) => void
@@ -24,6 +25,7 @@ const Header = ({ setShowSidenav }: HeaderProps) => {
   const { theme, setTheme, setModalType } = useUIStore()
   const { setSearchQuery } = useBookmarksStore()
   const navigate = useNavigate()
+  const { addNotification } = useNotification()
 
   const handleModalOpen = useCallback(() => setModalType('add'), [])
 
@@ -108,7 +110,14 @@ const Header = ({ setShowSidenav }: HeaderProps) => {
                 <div className="border-b-[1.45px] border-ch-light-grey dark:border-ch-dark-mode-neutral-500 -mx-2"></div>
                 <div className="py-1">
                   <div
-                    onClick={() => navigate('/sign-in')}
+                    onClick={() => {
+                      navigate('/sign-in')
+                      addNotification({
+                        id: 'logout-notification-id',
+                        message: 'Logged out successfully.',
+                        duration: 5000,
+                      })
+                    }}
                     className="flex items-center gap-2 p-2 cursor-pointer rounded-md dark:hover:bg-ch-dark-mode-neutral-500 hover:bg-ch-light-mode-neutral-100 text-ch-light-mode-neutral-800 dark:text-ch-dark-mode-neutral-100 dark:hover:text-white hover:text-black transition-colors"
                   >
                     <SignOut />

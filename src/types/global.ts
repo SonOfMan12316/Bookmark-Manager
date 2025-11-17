@@ -51,7 +51,7 @@ export interface InputsInterface {
 export interface ToastNotification {
   id: string
   message: string
-  icon: ReactNode
+  icon?: ReactNode
   duration?: number
 }
 
