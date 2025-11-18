@@ -4,6 +4,7 @@ import { Button, FormSection } from '../ui'
 import { BookmarkFields } from '../../configs/forms/bookmark'
 import { type AddBookmarkForm } from '../../types/global'
 import useUIStore from '../../store/ui'
+import { useBookmarksStore } from '../../store'
 import { useNotification } from '../../hooks'
 import { Checkmark } from '../icons'
 
@@ -15,7 +16,8 @@ interface BookmarkFormProps {
 }
 
 const BookmarkForm = ({ mode, onClose }: BookmarkFormProps) => {
-  const { selectedBookmark } = useUIStore()
+  const { selectedBookmark, selectedBookmarkId } = useUIStore()
+  const { addBookmark, updateBookmark } = useBookmarksStore()
   const { addNotification } = useNotification()
 
   const {
@@ -31,34 +33,50 @@ const BookmarkForm = ({ mode, onClose }: BookmarkFormProps) => {
       setValue('title', selectedBookmark.title)
       setValue('description', selectedBookmark.description)
       setValue('url', selectedBookmark.url)
-      setValue('tags', selectedBookmark.tags)
+
+      const tagsString = Array.isArray(selectedBookmark.tags) 
+        ? selectedBookmark.tags.join(', ')
+        : String(selectedBookmark.tags || '')
+      setValue('tags', tagsString as any)
     }
-  }, [selectedBookmark])
+  }, [selectedBookmark, mode, setValue])
 
-  const onSubmit = () => {
+  const onSubmit = (data: any) => {
+    const tagsValue = data.tags || ''
+    const tagsArray = Array.isArray(tagsValue) 
+      ? tagsValue 
+      : String(tagsValue).split(',').map((t: string) => t.trim()).filter((t: string) => t.length > 0)
+
     if (mode === 'add') {
-    } else if (mode === 'edit') {
-    }
-
-    onClose()
-  }
-
-  const showToast = (mode: Mode) => {
-    if (mode === 'add') {
+      addBookmark({
+        title: data.title,
+        url: data.url,
+        description: data.description,
+        tags: tagsArray,
+        favicon: '',
+      })
       addNotification({
         id: 'add-bookmark-id',
         message: 'Bookmark added successfully.',
         icon: <Checkmark />,
         duration: 5000,
       })
-    } else {
+    } else if (mode === 'edit' && selectedBookmarkId) {
+      updateBookmark(selectedBookmarkId, {
+        title: data.title,
+        url: data.url,
+        description: data.description,
+        tags: tagsArray,
+      })
       addNotification({
-        id: 'add-bookmark-id',
+        id: 'edit-bookmark-id',
         message: 'Changes saved.',
         icon: <Checkmark />,
         duration: 5000,
       })
     }
+
+    onClose()
   }
 
   return (
@@ -77,7 +95,7 @@ const BookmarkForm = ({ mode, onClose }: BookmarkFormProps) => {
         <Button variant="neutral" onClick={onClose} type="button">
           Cancel
         </Button>
-        <Button type="submit" onClick={() => showToast(mode)} variant="primary">
+        <Button  type="submit" variant="primary">
           {mode === 'add' ? 'Add Bookmark' : 'Save Bookmark'}
         </Button>
       </div>

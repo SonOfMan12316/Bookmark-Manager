@@ -18,6 +18,7 @@ import { PopOver, Dialog } from '../ui'
 import { ensureUrl } from '../../utils/validators'
 import { useNotification } from '../../hooks'
 import { useUIStore } from '../../store'
+import { useBookmarksStore } from '../../store'
 
 interface BookmarkProp {
   bookmark: Bookmark
@@ -49,7 +50,8 @@ const BookmarkCard = ({ bookmark }: BookmarkProp) => {
   })
   const { addNotification } = useNotification()
 
-  const { setModalType, setSelectedBookmark } = useUIStore()
+  const { setModalType, setSelectedBookmark, setSelectedBookmarkId } = useUIStore()
+  const { archiveBookmark, unarchiveBookmark, deleteBookmark, pinBookmark, unpinBookmark, trackVisit } = useBookmarksStore()
 
   const handleCopyUrl = async () => {
     try {
@@ -72,6 +74,7 @@ const BookmarkCard = ({ bookmark }: BookmarkProp) => {
 
   const handlePin = (bookmark: Bookmark) => {
     if(bookmark.pinned) {
+      unpinBookmark(bookmark.id)
       addNotification({
         id: 'un-pin-bookmark-id',
         message: 'Bookmark unpinned.',
@@ -79,6 +82,7 @@ const BookmarkCard = ({ bookmark }: BookmarkProp) => {
         duration: 5000,
       })
     } else {
+      pinBookmark(bookmark.id)
       addNotification({
         id: 'pin-bookmark-id',
         message: 'Bookmark pinned to top.',
@@ -110,6 +114,7 @@ const BookmarkCard = ({ bookmark }: BookmarkProp) => {
 
   const handleDialogConfirm = () => {
     if (dialogState.action === 'delete') {
+      deleteBookmark(bookmark.id)
       addNotification({
         id: 'delete-bookmark-id',
         message: 'Bookmark deleted.',
@@ -117,13 +122,15 @@ const BookmarkCard = ({ bookmark }: BookmarkProp) => {
         duration: 5000,
       })
     } else if (dialogState.action === 'archive') {
+      archiveBookmark(bookmark.id)
       addNotification({
         id: 'archive-bookmark-id',
         message: 'Bookmark archived.',
         icon: <Archive />,
         duration: 5000,
       })
-    } else {
+    } else if (dialogState.action === 'unarchive') {
+      unarchiveBookmark(bookmark.id)
       addNotification({
         id: 'archive-bookmark-id',
         message: 'Bookmark restored.',
@@ -161,12 +168,24 @@ const BookmarkCard = ({ bookmark }: BookmarkProp) => {
   })()
 
   const handleEdit = () => {
-    setSelectedBookmark(bookmark)
+    setSelectedBookmark({
+      title: bookmark.title,
+      description: bookmark.description,
+      url: bookmark.url,
+      tags: bookmark.tags,
+    })
+    setSelectedBookmarkId(bookmark.id)
     setModalType('edit')
   }
 
+  const handleVisit = (bookmarkToVisit?: Bookmark) => {
+    const targetBookmark = bookmarkToVisit || bookmark
+    trackVisit(targetBookmark.id)
+    window.open(ensureUrl(targetBookmark.url), '_blank', 'noopener,noreferrer')
+  }
+
   const activeActions: ActionItem[] = [
-    { icon: <External />, label: 'Visit', href: ensureUrl(bookmark.url) },
+    { icon: <External />, label: 'Visit', onClick: handleVisit },
     { icon: <Copy />, label: 'Copy URL', onClick: handleCopyUrl },
     { icon: <Pin />, label: bookmark.pinned ? 'Unpin' : 'Pin', onClick: () => handlePin(bookmark) },
     { icon: <Edit />, label: 'Edit', onClick: handleEdit },
@@ -174,7 +193,7 @@ const BookmarkCard = ({ bookmark }: BookmarkProp) => {
   ]
 
   const archivedActions: ActionItem[] = [
-    { icon: <External />, label: 'Visit', href: ensureUrl(bookmark.url) },
+    { icon: <External />, label: 'Visit', onClick: handleVisit },
     { icon: <Copy />, label: 'Copy URL', onClick: handleCopyUrl },
     { icon: <Refresh />, label: 'Unarchive', onClick: openArchiveDialog },
     { icon: <Trash />, label: 'Delete Permanently', onClick: openDeleteDialog },
@@ -222,7 +241,7 @@ const BookmarkCard = ({ bookmark }: BookmarkProp) => {
                   onClick={onClick ? () => onClick(bookmark) : undefined}
                 >
                   <div className="flex items-center justify-start p-2 font-semibold text-sm cursor-pointer rounded-md dark:hover:bg-ch-dark-mode-neutral-500 hover:bg-ch-light-mode-neutral-100 text-ch-light-mode-neutral-800 dark:text-ch-dark-mode-neutral-100 dark:hover:text-white transition-colors w-full">
-                    {href ? (
+                    {href && !onClick ? (
                       <a
                         target="_blank"
                         href={ensureUrl(bookmark.url)}

@@ -97,7 +97,7 @@ const SortOptions = ({ sortBy, setSortBy }: SortOptionsProp) => {
 const Home = () => {
   const [popOpen, setPopOpen] = useState<boolean>(false)
 
-  const { modalType, setModalType } = useUIStore()
+  const { modalType, setModalType, setSelectedBookmarkId } = useUIStore()
   const {
     bookmarks,
     filter,
@@ -112,7 +112,10 @@ const Home = () => {
     () => getFilteredBookmarks(),
     [bookmarks, filter, searchQuery, selectedTags, getFilteredBookmarks, sortBy]
   )
-  const handleModalClose = useCallback(() => setModalType(null), [])
+  const handleModalClose = useCallback(() => {
+    setModalType(null)
+    setSelectedBookmarkId(null)
+  }, [])
   const addModal = modalType === 'add'
 
   return (

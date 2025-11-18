@@ -13,7 +13,6 @@ export const BookmarkFields = (): InputsInterface[] => [
         value: 2,
         message: 'Title cannot be less than 2 characters',
       },
-      pattern: fullNamePattern('title'),
     },
   },
   {

@@ -10,6 +10,7 @@ type UI = {
   theme: Theme
   modalType: ModalType
   selectedBookmark?: AddBookmarkForm | null
+  selectedBookmarkId?: string | null
 }
 
 type Actions = {
@@ -17,6 +18,7 @@ type Actions = {
   setModalType: (state: UI['modalType']) => void
   setTheme: (newTheme: UI['theme']) => void
   setSelectedBookmark: (bookmark: AddBookmarkForm) => void
+  setSelectedBookmarkId: (id: string | null) => void
 }
 
 type UIActions = UI & Actions
@@ -29,10 +31,12 @@ const useUIStore = create<UIActions>()(
       isModalOpen: false,
       modalType: null,
       selectedBookmark: null,
+      selectedBookmarkId: null,
       setPopOverState: (popoverState) => set({ popoverState }),
       setTheme: (theme) => set({ theme }),
       setModalType: (modalType) => set({ modalType }),
       setSelectedBookmark: (selectedBookmark) => set({ selectedBookmark }),
+      setSelectedBookmarkId: (selectedBookmarkId) => set({ selectedBookmarkId }),
     }),
     {
       name: 'global-ui-storage',

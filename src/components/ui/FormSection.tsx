@@ -81,7 +81,7 @@ const FormSection = <T extends FieldValues>({
             {...inputRegisterProps}
             label={inputLabel}
             variant={fieldVariant ?? variant}
-            maxLength={280}
+            maxLength={170}
             hasError={hasError}
             aria-invalid={Boolean(fieldError)}
             aria-describedby={fieldError ? errorId : undefined}
@@ -103,7 +103,7 @@ const FormSection = <T extends FieldValues>({
     }
   }
 
-  const descriptionLengthAllowed = 280
+  const descriptionLengthAllowed = 170
 
   return (
     <div className="w-full">
