@@ -1,5 +1,4 @@
 import type { InputsInterface } from '../../types/global'
-import { fullNamePattern } from '../../utils/validators'
 
 export const BookmarkFields = (): InputsInterface[] => [
   {

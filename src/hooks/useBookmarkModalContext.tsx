@@ -5,7 +5,7 @@ interface BookmarkModalContextType {
   isOpen: boolean
   mode: 'add' | 'edit' | null
   bookmark: Bookmark | null
-  openModal: () => void
+  openModal?: () => void
   closeModal: () => void
   openAdd: () => void
   openEdit: (boomark: Bookmark) => void
@@ -36,13 +36,13 @@ export const BookmarkModalProvider = ({
     setIsOpen(true)
   }
 
-  const close = () => {
+  const closeModal = () => {
     setIsOpen(false)
     setMode(null)
     setBookmark(null)
   }
 
-  const value: BookmarkModalContextType = {
+  const contextValue: BookmarkModalContextType = {
     isOpen,
     mode,
     bookmark,
@@ -52,7 +52,7 @@ export const BookmarkModalProvider = ({
   }
 
   return (
-    <BookmarkModalContext.Provider value={value}>
+    <BookmarkModalContext.Provider value={contextValue}>
       {children}
     </BookmarkModalContext.Provider>
   )

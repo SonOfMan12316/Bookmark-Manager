@@ -1,7 +1,7 @@
 import { useNotification } from '../../hooks'
 import { Cancel } from '../icons'
 
-export const ToastContainer = () => {
+const ToastContainer = () => {
   const {
     notificationsList,
     removeNotification,

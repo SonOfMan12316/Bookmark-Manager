@@ -12,7 +12,7 @@ interface NotificationTimer {
   startTime: number
 }
 
-export const ToastNotificationProvider = ({
+const ToastNotificationProvider = ({
   children,
 }: ToastNotificationProviderProp) => {
   const [notificationsList, setNotificationsList] = useState<
