@@ -2,41 +2,21 @@
   "name": "bookmark-manager",
   "private": true,
   "version": "0.0.0",
-  "type": "module",
+  "description": "Bookmark Manager - Full-stack application with React frontend and NestJS/Express backend",
   "scripts": {
-    "dev": "vite",
-    "dev:server": "node server/index.mjs",
-    "build": "tsc -b && vite build",
-    "lint": "eslint .",
-    "preview": "vite preview",
-    "server": "node server/index.mjs"
-  },
-  "dependencies": {
-    "@google/genai": "^1.29.1",
-    "classnames": "^2.5.1",
-    "cors": "^2.8.5",
-    "dotenv": "^17.2.3",
-    "express": "^4.21.2",
-    "react": "^19.1.1",
-    "react-dom": "^19.1.1",
-    "react-hook-form": "^7.65.0",
-    "react-router-dom": "^7.9.4",
-    "zustand": "^5.0.8"
+    "install:all": "npm install && cd frontend && npm install && cd ../backend && npm install && cd ..",
+    "dev": "npm run dev --prefix frontend",
+    "dev:backend": "npm run server:dev --prefix backend",
+    "dev:all": "concurrently --names \"frontend,backend\" --prefix-colors \"blue,green\" \"npm run dev\" \"npm run dev:backend\"",
+    "build": "npm run build --prefix frontend",
+    "build:backend": "npm run build --prefix backend",
+    "build:all": "npm run build:backend && npm run build",
+    "start:backend": "npm run start:prod --prefix backend",
+    "server": "npm run server --prefix backend",
+    "lint": "npm run lint --prefix frontend",
+    "lint:backend": "npm run lint --prefix backend"
   },
   "devDependencies": {
-    "@eslint/js": "^9.36.0",
-    "@tailwindcss/vite": "^4.1.14",
-    "@types/node": "^24.6.0",
-    "@types/react": "^19.1.16",
-    "@types/react-dom": "^19.1.9",
-    "@vitejs/plugin-react": "^5.0.4",
-    "eslint": "^9.36.0",
-    "eslint-plugin-react-hooks": "^5.2.0",
-    "eslint-plugin-react-refresh": "^0.4.22",
-    "globals": "^16.4.0",
-    "tailwindcss": "^4.1.14",
-    "typescript": "~5.9.3",
-    "typescript-eslint": "^8.45.0",
-    "vite": "^7.1.7"
+    "concurrently": "^9.1.2"
   }
 }
