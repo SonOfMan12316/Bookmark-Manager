@@ -41,6 +41,5 @@ npm run dev:backend
 
 - `frontend/` - React + Vite frontend application
 - `backend/` - NestJS + Express backend
-  - `index.mjs` - Express server for AI suggestions API
   - `src/` - NestJS application
 - `api/` - Vercel serverless functions for deployment
