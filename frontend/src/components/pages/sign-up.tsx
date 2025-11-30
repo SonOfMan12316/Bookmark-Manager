@@ -14,8 +14,13 @@ const SignUp = () => {
   const navigate = useNavigate()
   const {
     register,
+    handleSubmit,
     formState: { errors },
   } = useForm<SignUpForm>()
+
+  const onSubmit = (data: SignUpForm) => {
+    console.log(data)
+  }
 
   return (
     <OnboardingLayout
@@ -23,7 +28,7 @@ const SignUp = () => {
       instruction="Join us and start saving your favorite links — organized, searchable, and always within reach."
     >
       {' '}
-      <form className="sm:pt-2">
+      <form onSubmit={handleSubmit(onSubmit)} className="sm:pt-2">
         <div>
           <Input
             label="Full Name"
@@ -40,7 +45,8 @@ const SignUp = () => {
             </span>
           )}
         </div>
-        <div className="mt-4">
+        <div className="flex gap-4 mt-1 lg:mt-4 w-full">
+        <div className="">
           <Input
             label="Email"
             placeholder=""
@@ -55,12 +61,12 @@ const SignUp = () => {
             required
           />
           {errors.email && (
-            <span role="alert" className="text-xs text-ch-danger">
+            <span role="alert" className="font-medium text-xs text-ch-light-mode-neutral-800 dark:text-ch-dark-mode-neutral-100">
               {errors.email?.message}
             </span>
           )}
         </div>
-        <div className="mt-4">
+        <div className="">
           <Input
             label="Password"
             placeholder=""
@@ -75,13 +81,14 @@ const SignUp = () => {
             })}
             required
           />
-          {errors.email && (
+          {errors.password && (
             <span role="alert" className="text-xs text-ch-danger">
-              {errors.email?.message}
+              {errors.password?.message}
             </span>
           )}
         </div>
-        <Button className="mt-4.5">Create Account</Button>
+        </div>
+        <Button type="submit" className="mt-4.5">Create Account</Button>
         <div className="mt-4.5 sm:mt-6 text-center">
           <p className="font-medium text-sm text-ch-light-mode-neutral-800 dark:text-ch-dark-mode-neutral-100">
             Already have an account?{' '}

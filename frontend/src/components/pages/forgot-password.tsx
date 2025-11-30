@@ -11,15 +11,20 @@ const ForgotPassword = () => {
   const navigate = useNavigate()
   const {
     register,
+    handleSubmit,
     formState: { errors },
   } = useForm<ForgotPasswordForm>()
+
+  const onSubmit = (data: ForgotPasswordForm) => {
+    console.log(data)
+  }
 
   return (
     <OnboardingLayout
       title="Forgot your password?"
       instruction="Enter your email address below and we’ll send you a link to reset your password."
     >
-      <form className="pt-2">
+      <form onSubmit={handleSubmit(onSubmit)} className="pt-2">
         <div>
           <Input
             label="Email"

@@ -12,15 +12,20 @@ const SignIn = () => {
   const navigate = useNavigate()
   const {
     register,
+    handleSubmit,
     formState: { errors },
   } = useForm<SignInForm>()
+
+  const onSubmit = (data: SignInForm) => {
+    console.log(data)
+  }
 
   return (
     <OnboardingLayout
       title="Log in to your account"
       instruction="Welcome back! Please enter your details."
     >
-      <form className="pt-2">
+      <form onSubmit={handleSubmit(onSubmit)} className="pt-2">
         <div>
           <Input
             label="Email"
@@ -61,7 +66,7 @@ const SignIn = () => {
             </span>
           )}
         </div>
-        <Button onClick={() => navigate('/home')} className="mt-4.5">
+        <Button type="submit" onClick={() => navigate('/home')} className="mt-4.5">
           Log in
         </Button>
         <div className="mt-4.5 sm:mt-6 text-center">

@@ -14,18 +14,23 @@ const ResetPassword = () => {
   const navigate = useNavigate()
   const {
     register,
+    handleSubmit,
     watch,
     formState: { errors },
   } = useForm<ResetPasswordForm>()
   const password = useRef<unknown>({})
   password.current = watch('password', '')
 
+  const onSubmit = (data: ResetPasswordForm) => {
+    console.log(data)
+  }
+
   return (
     <OnboardingLayout
       title="Reset Your Password"
       instruction="Enter your new password below. Make sure it’s strong and secure."
     >
-      <form className="pt-2">
+      <form onSubmit={handleSubmit(onSubmit)} className="pt-2">
         <div>
           <Input
             label="New Password"
