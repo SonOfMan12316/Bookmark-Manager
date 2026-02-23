@@ -3,9 +3,11 @@ import { AppModule } from './app.module';
 import { AppConfig } from './app.config';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { ForbiddenException, ValidationPipe } from '@nestjs/common';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
 async function bootstrap() {
-  let whiteList = [AppConfig().FRONTEND_URL];
+  const config = AppConfig();
+  let whiteList = [config.FRONTEND_URL];
 
   let globalPrefix = 'api';
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
@@ -24,7 +26,17 @@ async function bootstrap() {
   });
   
   app.useGlobalPipes(new ValidationPipe());
+
+  const swaggerConfig = new DocumentBuilder()
+    .setTitle('Bookmark Manager API')
+    .setDescription('API documentation for the Bookmark Manager backend')
+    .setVersion('1.0')
+    .addBearerAuth()
+    .build();
+  const swaggerDocument = SwaggerModule.createDocument(app, swaggerConfig);
+  SwaggerModule.setup(`${globalPrefix}/docs`, app, swaggerDocument);
   
-  await app.listen(3000);
+  const port = Number(config.PORT) || process.env.PORT || 9000;
+  await app.listen(port, '0.0.0.0');
 }
 bootstrap();
