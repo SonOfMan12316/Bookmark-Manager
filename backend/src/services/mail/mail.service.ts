@@ -1,40 +1,61 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import { Injectable, InternalServerErrorException, Logger } from '@nestjs/common';
 import * as nodemailer from 'nodemailer';
 import { AppConfig } from 'src/app.config';
 
 @Injectable()
 export class MailService {
   private transporter: nodemailer.Transporter;
+  private readonly logger = new Logger(MailService.name);
+  private isEmailConfigured = false;
 
   constructor() {
     const config = AppConfig();
-    this.transporter = nodemailer.createTransport({
-      host: config.EMAIL_HOST as string,
-      port: Number(config.EMAIL_PORT),
-      secure: false,
-      auth: {
-        user: config.EMAIL_USERNAME as string,
-        pass: config.EMAIL_PASSWORD as string,
-      },
-    } as nodemailer.TransportOptions);
+    
+    // Only create transporter if email config is provided
+    if (config.EMAIL_HOST && config.EMAIL_USERNAME && config.EMAIL_PASSWORD) {
+      this.transporter = nodemailer.createTransport({
+        host: config.EMAIL_HOST as string,
+        port: Number(config.EMAIL_PORT),
+        secure: false,
+        auth: {
+          user: config.EMAIL_USERNAME as string,
+          pass: config.EMAIL_PASSWORD as string,
+        },
+      } as nodemailer.TransportOptions);
 
-    this.verifyConnection();
+      // Verify connection asynchronously without blocking startup
+      this.verifyConnection().catch((error) => {
+        this.logger.warn('Email transporter verification failed. Email functionality may not work.', error.message);
+      });
+    } else {
+      this.logger.warn('Email configuration is missing. Email functionality will be disabled.');
+    }
   }
 
   private async verifyConnection(): Promise<void> {
+    if (!this.transporter) return;
+    
     try {
       await this.transporter.verify();
+      this.isEmailConfigured = true;
+      this.logger.log('Email transporter verified successfully');
     } catch (error) {
-      throw new InternalServerErrorException('Email transporter verification failed')
+      this.isEmailConfigured = false;
+      this.logger.warn('Email transporter verification failed:', error.message);
     }
   }
 
   async sendPasswordResetEmail(email: string, resetToken: string): Promise<void> {
+    if (!this.transporter || !this.isEmailConfigured) {
+      this.logger.error('Email service is not configured. Cannot send password reset email.');
+      throw new InternalServerErrorException('Email service is not available. Please contact support.');
+    }
+
     const config = AppConfig();
     const resetLink = `${config.FRONTEND_URL}/reset-password?token=${resetToken}`;
     
     const mailOptions: nodemailer.SendMailOptions = {
-      from: config.EMAIL_USERNAME as string,
+      from: config.EMAIL_FROM || config.EMAIL_USERNAME as string,
       to: email,
       subject: 'Password Reset Request',
       html: `
@@ -58,7 +79,9 @@ export class MailService {
     
     try {
       await this.transporter.sendMail(mailOptions);
+      this.logger.log(`Password reset email sent to ${email}`);
     } catch (error) {
+      this.logger.error(`Failed to send password reset email: ${error.message}`);
       throw new InternalServerErrorException(`Failed to send password reset email: ${error.message}`);
     }
   }
