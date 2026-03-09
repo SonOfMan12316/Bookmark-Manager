@@ -53,9 +53,10 @@ export class MailService {
 
     const config = AppConfig();
     const resetLink = `${config.FRONTEND_URL}/reset-password?token=${resetToken}`;
+    const emailFrom = (config as any).EMAIL_FROM || config.EMAIL_USERNAME;
     
     const mailOptions: nodemailer.SendMailOptions = {
-      from: config.EMAIL_FROM || config.EMAIL_USERNAME as string,
+      from: emailFrom as string,
       to: email,
       subject: 'Password Reset Request',
       html: `
