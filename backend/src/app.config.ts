@@ -8,4 +8,5 @@ export const AppConfig = () => ({
     EMAIL_USERNAME: process.env.EMAIL_USERNAME,
     EMAIL_PASSWORD: process.env.EMAIL_PASSWORD,
     FRONTEND_URL: process.env.FRONTEND_URL || 'http://localhost:5173',
+    EMAIL_FROM: process.env.EMAIL_FROM,
 })
