@@ -12,6 +12,8 @@
     "generate:api-types:prod": "node scripts/generate-api-types.js https://bookmark-manager-production-5553.up.railway.app/api"
   },
   "dependencies": {
+    "@tanstack/react-query": "^5.90.21",
+    "axios": "^1.13.6",
     "classnames": "^2.5.1",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
