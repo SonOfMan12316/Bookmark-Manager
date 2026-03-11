@@ -37,10 +37,16 @@ client.interceptors.response.use(
     if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
       
-      // Clear auth state and redirect to login
-      clearAuthToken();
-      if (typeof window !== 'undefined') {
-        window.location.href = '/sign-in';
+      // Don't redirect if it's an auth endpoint (login/signup) - let the error bubble up
+      const isAuthEndpoint = originalRequest.url?.includes('/auth/login') || 
+                            originalRequest.url?.includes('/auth/signup');
+      
+      if (!isAuthEndpoint) {
+        // Only redirect if it's a protected endpoint (not auth endpoints)
+        clearAuthToken();
+        if (typeof window !== 'undefined') {
+          window.location.href = '/sign-in';
+        }
       }
       
       return Promise.reject(error);
