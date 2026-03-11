@@ -4,10 +4,12 @@ import {
   type Ref,
   forwardRef,
   useRef,
+  useState,
 } from 'react'
 import classnames from 'classnames'
 import { type InputVariant } from '../../types/ui'
 import { useMergeRefs } from '../../hooks'
+import { Eye, EyeOff } from '../icons'
 
 interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   className?: string
@@ -37,6 +39,12 @@ const Input = forwardRef<HTMLInputElement, InputProps>((props, ref) => {
   } = props
   const inputRef = useRef<HTMLInputElement>(null)
   const mergeRefs = useMergeRefs([ref, inputRef, extraRef ?? null])
+  const [showPassword, setShowPassword] = useState(false)
+
+  const isPasswordField = type === 'password'
+  const effectiveType = isPasswordField && showPassword ? 'text' : type
+  
+  const inputProps = { ...rest }
 
   const inputWrapperClass = classnames(
     'w-full h-fit relative rounded-lg border-[1.45px] shadow-[0_2px_4px_0_rgba(21, 21, 21, 0.06)] px-3',
@@ -70,8 +78,8 @@ const Input = forwardRef<HTMLInputElement, InputProps>((props, ref) => {
     },
     {
       '!pl-8': icon && placement === 'start',
-      '!pr-12': icon && placement === 'end',
-    }
+      '!pr-12': (icon && placement === 'end') || isPasswordField,
+    },
   )
 
   const iconClass = classnames('absolute -translate-y-1/2 top-1/2 mt-[0.5px]', {
@@ -93,12 +101,34 @@ const Input = forwardRef<HTMLInputElement, InputProps>((props, ref) => {
         </span>
       )}
       <div className={inputWrapperClass}>
-        {icon && <span className={iconClass}>{icon}</span>}
+        {icon && placement === 'start' && <span className={iconClass}>{icon}</span>}
+        {isPasswordField && (
+          <button
+            type="button"
+            className={classnames(
+              'absolute -translate-y-1/2 top-1/2 mt-[0.5px] right-3 cursor-pointer text-ch-light-mode-neutral-700 dark:text-ch-dark-mode-neutral-100 hover:text-ch-light-mode-neutral-900 dark:hover:text-ch-dark-mode-neutral-50 transition-colors z-10',
+              {
+                'mr-3': !icon || placement === 'start',
+              }
+            )}
+            onClick={(e) => {
+              e.preventDefault()
+              setShowPassword((prev) => !prev)
+            }}
+            aria-label={showPassword ? 'Hide password' : 'Show password'}
+            tabIndex={0}
+          >
+            {showPassword ? <EyeOff /> : <Eye />}
+          </button>
+        )}
+        {icon && placement === 'end' && !isPasswordField && (
+          <span className={iconClass}>{icon}</span>
+        )}
         <input
-          {...rest}
+          {...inputProps}
           className={inputClass}
           placeholder={placeholder}
-          type={type}
+          type={effectiveType}
           autoComplete={autoComplete}
           autoCorrect="off"
           autoCapitalize="off"
