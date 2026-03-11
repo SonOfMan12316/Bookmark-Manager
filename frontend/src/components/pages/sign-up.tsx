@@ -1,8 +1,12 @@
 import OnboardingLayout from '../layouts/onboarding-layout'
 import { useForm } from 'react-hook-form'
-import { Button, Input } from '../ui'
+import { Button, Input, LoadingDots } from '../ui'
 import { useNavigate } from 'react-router-dom'
 import { passwordPattern } from '../../utils/validators'
+import { useSignup } from '../../hooks/api'
+import { useNotification } from '../../hooks'
+import { useAuthStore } from '../../store/auth.store'
+import type { SignupDto } from '../../types/api'
 
 interface SignUpForm {
   fullName: string
@@ -18,8 +22,38 @@ const SignUp = () => {
     formState: { errors },
   } = useForm<SignUpForm>()
 
-  const onSubmit = (data: SignUpForm) => {
-    console.log(data)
+	const signup = useSignup()
+	const { addNotification } = useNotification()
+	const { setAuth } = useAuthStore()
+
+  const onSubmit = (data: SignupDto) => {
+		signup.mutate(data, {
+			onSuccess: (response) => {
+				if (response?.user && response?.tokens) {
+					setAuth(response.user, response.tokens)
+					addNotification({
+						id: 'signup-success-id',
+						message: 'Signup successful.',
+						duration: 2000,
+					})
+					navigate('/home')
+				} else {
+					addNotification({
+						id: 'signup-error-id',
+						message: 'Signup failed: Invalid response from server',
+						duration: 3000,
+					})
+				}
+			},
+			onError: (error: any) => {
+				const errorMessage = error?.message || error?.response?.data?.message || 'Signup failed. Please try again.'
+				addNotification({
+					id: 'signup-error-id',
+					message: errorMessage,
+					duration: 3000,
+				})
+			}
+		})
   }
 
   return (
@@ -88,7 +122,9 @@ const SignUp = () => {
           )}
         </div>
         </div>
-        <Button type="submit" className="mt-4.5">Create Account</Button>
+        <Button type="submit" className="mt-4.5">
+					{ signup.isPending ? <LoadingDots /> : 'Create Account' }
+				</Button>
         <div className="mt-4.5 sm:mt-6 text-center">
           <p className="font-medium text-sm text-ch-light-mode-neutral-800 dark:text-ch-dark-mode-neutral-100">
             Already have an account?{' '}

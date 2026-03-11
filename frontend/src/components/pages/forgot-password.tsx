@@ -1,7 +1,10 @@
 import OnboardingLayout from '../layouts/onboarding-layout'
 import { useForm } from 'react-hook-form'
-import { Button, Input } from '../ui'
+import { Button, Input, LoadingDots } from '../ui'
 import { useNavigate } from 'react-router-dom'
+import { useForgotPassword } from '../../hooks/api'
+import { useNotification } from '../../hooks'
+import type { ForgotPasswordDto } from '../../types/api'
 
 interface ForgotPasswordForm {
   email: string
@@ -15,8 +18,27 @@ const ForgotPassword = () => {
     formState: { errors },
   } = useForm<ForgotPasswordForm>()
 
-  const onSubmit = (data: ForgotPasswordForm) => {
-    console.log(data)
+const forgotPassword = useForgotPassword()
+	const { addNotification } = useNotification()
+
+  const onSubmit = (data: ForgotPasswordDto) => {
+		forgotPassword.mutate(data, {
+			onSuccess: (data) => {
+				addNotification({
+					id: 'forgot-password-success-id',
+					message: data.message,
+					duration: 2000,
+				})
+				navigate('/reset-password')
+			},
+			onError: (error) => {
+				addNotification({
+					id: 'forgot-password-error-id',
+					message: error.message,
+					duration: 2000,
+				})
+			}
+		})
   }
 
   return (
@@ -45,8 +67,8 @@ const ForgotPassword = () => {
             </span>
           )}
         </div>
-        <Button onClick={() => navigate('/reset-password')} className="mt-4.5">
-          Send reset link
+        <Button type="submit" className="mt-4.5">
+					{ forgotPassword.isPending ? <LoadingDots /> : 'Send reset link' }
         </Button>
         <div className="mt-6 text-center">
           <p className="font-medium text-sm">

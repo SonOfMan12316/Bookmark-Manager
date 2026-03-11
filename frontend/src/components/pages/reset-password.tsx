@@ -1,9 +1,12 @@
 import OnboardingLayout from '../layouts/onboarding-layout'
 import { useForm } from 'react-hook-form'
-import { Button, Input } from '../ui'
-import { useNavigate } from 'react-router-dom'
+import { Button, Input, LoadingDots } from '../ui'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import { passwordPattern } from '../../utils/validators'
 import { useRef } from 'react'
+import { useResetPassword } from '../../hooks/api'
+import { useNotification } from '../../hooks/useNotificationContext'
+import type { ResetPasswordDto } from '../../types/api'
 
 interface ResetPasswordForm {
   password: string
@@ -12,6 +15,7 @@ interface ResetPasswordForm {
 
 const ResetPassword = () => {
   const navigate = useNavigate()
+  const [searchParams] = useSearchParams()
   const {
     register,
     handleSubmit,
@@ -21,8 +25,43 @@ const ResetPassword = () => {
   const password = useRef<unknown>({})
   password.current = watch('password', '')
 
+	const resetPassword = useResetPassword()
+	const { addNotification } = useNotification()
+
   const onSubmit = (data: ResetPasswordForm) => {
-    console.log(data)
+    const token = searchParams.get('token')
+    
+    if (!token) {
+      addNotification({
+        id: 'reset-password-error-id',
+        message: 'Reset token is missing. Please use the link from your email.',
+        duration: 3000,
+      })
+      return
+    }
+
+    const resetPasswordData: ResetPasswordDto = {
+      token,
+      newPassword: data.password,
+    }
+
+    resetPassword.mutate(resetPasswordData, {
+      onSuccess: () => {
+				addNotification({	
+					id: 'reset-password-success-id',
+					message: 'Password reset successful.',
+					duration: 2000,
+				})
+				navigate('/sign-in')
+      },
+      onError: (error) => {
+        addNotification({
+          id: 'reset-password-error-id',
+          message: error.message,
+          duration: 2000,
+				})
+			}
+		})
   }
 
   return (
@@ -56,7 +95,7 @@ const ResetPassword = () => {
           <Input
             label="Confirm Password"
             placeholder=""
-            type="email"
+            type="password"
             {...register('confirmPassword', {
               required: 'Confirm Password is required',
               validate: (value: unknown) =>
@@ -70,8 +109,8 @@ const ResetPassword = () => {
             </span>
           )}
         </div>
-        <Button onClick={() => navigate('/home')} className="mt-4.5">
-          Reset Password
+        <Button type="submit" className="mt-4.5">
+          {resetPassword.isPending ? <LoadingDots /> : 'Reset Password'}
         </Button>
         <div className="mt-6 text-center">
           <p className="font-medium text-sm">

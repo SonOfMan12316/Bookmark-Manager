@@ -1,7 +1,12 @@
 import { useNavigate } from 'react-router-dom'
 import { useForm } from 'react-hook-form'
 import OnboardingLayout from '../layouts/onboarding-layout'
-import { Input, Button } from '../ui'
+import { Input, Button, LoadingDots } from '../ui'
+import { useLogin } from '../../hooks/api'
+import type { LoginDto } from '../../types/api'
+import { useNotification } from '../../hooks'
+import { Eye } from '../icons'
+import { getErrorMessage } from '../../services/error.service'
 
 interface SignInForm {
   email: string
@@ -16,8 +21,28 @@ const SignIn = () => {
     formState: { errors },
   } = useForm<SignInForm>()
 
-  const onSubmit = (data: SignInForm) => {
-    console.log(data)
+	const login = useLogin()
+	const { addNotification } = useNotification()
+
+  const onSubmit = (data: LoginDto) => {
+		login.mutate(data, {
+			onSuccess: () => {
+				addNotification({
+					id: 'login-success-id',
+					message: 'Login successful.',
+					duration: 2000,
+				})
+				navigate('/home')
+			},
+			onError: (error) => {
+				const errorMessage = getErrorMessage(error)
+				addNotification({
+					id: 'login-error-id',
+					message: errorMessage,
+					duration: 3000,
+				})
+			}
+		})
   }
 
   return (
@@ -59,6 +84,8 @@ const SignIn = () => {
                 message: 'Password cannot be less than 8 characters',
               },
             })}
+						icon={<Eye/>}
+						placement="end"
           />
           {errors.email && (
             <span role="alert" className="text-xs text-ch-danger">
@@ -66,8 +93,8 @@ const SignIn = () => {
             </span>
           )}
         </div>
-        <Button type="submit" onClick={() => navigate('/home')} className="mt-4.5">
-          Log in
+        <Button type="submit" className="mt-4.5">
+					{ login.isPending ? <LoadingDots /> : 'Log in' }
         </Button>
         <div className="mt-4.5 sm:mt-6 text-center">
           <p className="font-medium text-sm text-ch-light-mode-neutral-800 dark:text-ch-dark-mode-neutral-100">
