@@ -16,7 +16,7 @@ const ToastContainer = () => {
         return (
           <div
             key={notification.id}
-            className={`toast-item w-[340px] h-10.5 cursor-pointer flex items-center justify-between bg-white dark:bg-ch-dark-mode-neutral-500 border border-ch-light-mode-neutral-300 dark:border-ch-dark-mode-neutral-400 rounded-lg px-3
+            className={`toast-item w-[340px] text-nowrap h-10.5 cursor-pointer flex items-center justify-between bg-white dark:bg-ch-dark-mode-neutral-500 border border-ch-light-mode-neutral-300 dark:border-ch-dark-mode-neutral-400 rounded-lg px-3
                       ${
                         removingIds.has(notification.id)
                           ? 'toast-exit'
