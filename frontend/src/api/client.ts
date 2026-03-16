@@ -1,7 +1,6 @@
 import axios from 'axios';
 import type { AxiosError, AxiosInstance, InternalAxiosRequestConfig } from 'axios';
 
-// Get API URL from environment or use default
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:9000';
 
 // Create axios instance
@@ -37,7 +36,6 @@ client.interceptors.response.use(
     if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
       
-      // Don't redirect if it's an auth endpoint (login/signup) - let the error bubble up
       const isAuthEndpoint = originalRequest.url?.includes('/auth/login') || 
                             originalRequest.url?.includes('/auth/signup');
       
