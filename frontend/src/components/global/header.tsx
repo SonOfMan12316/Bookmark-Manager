@@ -14,6 +14,7 @@ import { Button, Input, PopOver } from '../ui'
 import useUIStore from '../../store/ui'
 import { useBookmarksStore } from '../../store'
 import { useNotification } from '../../hooks'
+import { useLogout } from '../../hooks/api/useAuth'
 
 interface HeaderProps {
   setShowSidenav: (showSidenav: boolean) => void
@@ -26,8 +27,19 @@ const Header = ({ setShowSidenav }: HeaderProps) => {
   const { setSearchQuery } = useBookmarksStore()
   const navigate = useNavigate()
   const { addNotification } = useNotification()
+  const logout = useLogout()
 
   const handleModalOpen = useCallback(() => setModalType('add'), [])
+
+  const handleLogout = useCallback(() => {
+    logout()
+    navigate('/sign-in')
+    addNotification({
+      id: 'logout-notification-id',
+      message: 'Logged out successfully.',
+      duration: 5000,
+    })
+  }, [logout, navigate, addNotification])
 
   return (
     <div className="bg-white dark:bg-ch-dark-mode-neutral-800 border-b-[1.45px] dark:border-b-ch-dark-mode-neutral-500 border-b-ch-light-mode-neutral-100 h-16 px-4 sm:px-8 py-3 sm:py-6 lg:py-9 flex items-center gap-2 flex-grow">
@@ -110,14 +122,7 @@ const Header = ({ setShowSidenav }: HeaderProps) => {
                 <div className="border-b-[1.45px] border-ch-light-grey dark:border-ch-dark-mode-neutral-500 -mx-2"></div>
                 <div className="py-1">
                   <div
-                    onClick={() => {
-                      navigate('/sign-in')
-                      addNotification({
-                        id: 'logout-notification-id',
-                        message: 'Logged out successfully.',
-                        duration: 5000,
-                      })
-                    }}
+                    onClick={handleLogout}
                     className="flex items-center gap-2 p-2 cursor-pointer rounded-md dark:hover:bg-ch-dark-mode-neutral-500 hover:bg-ch-light-mode-neutral-100 text-ch-light-mode-neutral-800 dark:text-ch-dark-mode-neutral-100 dark:hover:text-white hover:text-black transition-colors"
                   >
                     <SignOut />

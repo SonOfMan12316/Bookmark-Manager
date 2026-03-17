@@ -98,3 +98,20 @@ export function useResetPassword() {
     },
   });
 }
+
+/**
+ * Logout hook - clears auth state and invalidates queries
+ */
+export function useLogout() {
+  const queryClient = useQueryClient();
+  const { clearAuth } = useAuthStore();
+
+  return () => {
+    clearAuth();
+
+    queryClient.clear();
+		
+    queryClient.removeQueries({ queryKey: ['auth'] });
+    queryClient.removeQueries({ queryKey: ['bookmarks'] });
+  };
+}
