@@ -2,6 +2,7 @@ import { useNavigate } from 'react-router-dom'
 import { useForm } from 'react-hook-form'
 import OnboardingLayout from '../layouts/onboarding-layout'
 import { Input, Button, LoadingDots } from '../ui'
+import { GoogleSignInButton } from '../global'
 import { useLogin } from '../../hooks/api'
 import type { LoginDto } from '../../types/api'
 import { useNotification } from '../../hooks'
@@ -21,28 +22,19 @@ const SignIn = () => {
     formState: { errors },
   } = useForm<SignInForm>()
 
-	const login = useLogin()
-	const { addNotification } = useNotification()
+  const login = useLogin()
+  const { addNotification } = useNotification()
 
   const onSubmit = (data: LoginDto) => {
-		login.mutate(data, {
-			onSuccess: () => {
-				addNotification({
-					id: 'login-success-id',
-					message: 'Login successful.',
-					duration: 2000,
-				})
-				navigate('/home')
-			},
-			onError: (error) => {
-				const errorMessage = getErrorMessage(error)
-				addNotification({
-					id: 'login-error-id',
-					message: errorMessage,
-					duration: 3000,
-				})
-			}
-		})
+    login.mutate(data, {
+      onSuccess: () => {
+        addNotification({ id: 'login-success-id', message: 'Login successful.', duration: 2000 })
+        navigate('/home')
+      },
+      onError: (error) => {
+        addNotification({ id: 'login-error-id', message: getErrorMessage(error), duration: 3000 })
+      },
+    })
   }
 
   return (
@@ -79,34 +71,34 @@ const SignIn = () => {
             variant="light"
             {...register('password', {
               required: 'Password is required',
-              minLength: {
-                value: 8,
-                message: 'Password cannot be less than 8 characters',
-              },
+              minLength: { value: 8, message: 'Password cannot be less than 8 characters' },
             })}
-						icon={<Eye/>}
-						placement="end"
+            icon={<Eye />}
+            placement="end"
           />
-          {errors.email && (
+          {errors.password && (
             <span role="alert" className="text-xs text-ch-danger">
-              {errors.email?.message}
+              {errors.password?.message}
             </span>
           )}
         </div>
+
         <Button type="submit" className="mt-4.5">
-					{ login.isPending ? <LoadingDots /> : 'Log in' }
+          {login.isPending ? <LoadingDots /> : 'Log in'}
         </Button>
+
+        <div className="mt-4.5 flex items-center gap-2">
+          <div className="flex-1 h-px bg-ch-light-mode-neutral-300 dark:bg-ch-dark-mode-neutral-500" />
+          <span className="text-xs font-medium text-ch-light-mode-neutral-600 dark:text-ch-dark-mode-neutral-400">OR</span>
+          <div className="flex-1 h-px bg-ch-light-mode-neutral-300 dark:bg-ch-dark-mode-neutral-500" />
+        </div>
+
+        <div className="mt-4.5">
+          <GoogleSignInButton label="Sign in with Google" />
+        </div>
+
         <div className="mt-4.5 sm:mt-6 text-center">
           <p className="font-medium text-sm text-ch-light-mode-neutral-800 dark:text-ch-dark-mode-neutral-100">
-            Forgot password?{' '}
-            <span
-              onClick={() => navigate('/forgot-password')}
-              className="font-semibold text-ch-light-mode-neutral-900 dark:text-white cursor-pointer"
-            >
-              Reset it
-            </span>
-          </p>
-          <p className="font-medium text-sm text-ch-light-mode-neutral-800 dark:text-ch-dark-mode-neutral-100 mt-1 sm:mt-3.5">
             Don't have an account?{' '}
             <span
               onClick={() => navigate('/sign-up')}

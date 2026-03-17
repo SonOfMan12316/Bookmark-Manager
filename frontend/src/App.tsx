@@ -7,8 +7,6 @@ import {
 import {
   SignIn,
   SignUp,
-  ForgotPassword,
-  ResetPassword,
   Home,
 } from './components/pages'
 import { useThemeInitializer } from './hooks'
@@ -23,8 +21,6 @@ const App = () => {
           <Route path="/" element={<Navigate to="sign-in" />} />
           <Route path="/sign-in" element={<SignIn />} />
           <Route path="/sign-up" element={<SignUp />} />
-          <Route path="/forgot-password" element={<ForgotPassword />} />
-          <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="/home" element={<Home />} />
         </Routes>
       </Router>

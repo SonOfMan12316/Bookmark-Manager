@@ -4,9 +4,8 @@ import { useAuthStore } from '../../store/auth.store';
 import type {
   SignupDto,
   LoginDto,
-  ForgotPasswordDto,
-  ResetPasswordDto,
 } from '../../api/types';
+import type { GoogleAuthDto } from '../../api/auth.api';
 import { getErrorMessage } from '../../services/error.service';
 
 /**
@@ -76,23 +75,18 @@ export function useLogin() {
 }
 
 /**
- * Forgot password mutation
+ * Google OAuth sign-in mutation
  */
-export function useForgotPassword() {
-  return useMutation({
-    mutationFn: (data: ForgotPasswordDto) => authApi.forgotPassword(data),
-    onError: (error) => {
-      throw new Error(getErrorMessage(error));
-    },
-  });
-}
+export function useGoogleAuth() {
+  const queryClient = useQueryClient();
+  const { setAuth } = useAuthStore();
 
-/**
- * Reset password mutation
- */
-export function useResetPassword() {
   return useMutation({
-    mutationFn: (data: ResetPasswordDto) => authApi.resetPassword(data),
+    mutationFn: (data: GoogleAuthDto) => authApi.googleAuth(data),
+    onSuccess: (response) => {
+      setAuth(response.user, response.tokens);
+      queryClient.setQueryData(['auth', 'current-user'], response.user);
+    },
     onError: (error) => {
       throw new Error(getErrorMessage(error));
     },
@@ -104,14 +98,19 @@ export function useResetPassword() {
  */
 export function useLogout() {
   const queryClient = useQueryClient();
-  const { clearAuth } = useAuthStore();
+  const { clearAuth, setIsLoading } = useAuthStore();
 
-  return () => {
-    clearAuth();
-
-    queryClient.clear();
-		
-    queryClient.removeQueries({ queryKey: ['auth'] });
-    queryClient.removeQueries({ queryKey: ['bookmarks'] });
-  };
+  return useMutation({
+    mutationFn: async () => {
+      setIsLoading(true);
+      try {
+        clearAuth();
+        queryClient.clear();
+        queryClient.removeQueries({ queryKey: ['auth'] });
+        queryClient.removeQueries({ queryKey: ['bookmarks'] });
+      } finally {
+        setIsLoading(false);
+      }
+    },
+  });
 }

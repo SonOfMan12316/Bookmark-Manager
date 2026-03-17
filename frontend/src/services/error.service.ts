@@ -34,7 +34,7 @@ export function getErrorMessage(error: unknown): string {
     (lowerMessage.includes('403') && (lowerMessage.includes('status') || lowerMessage.includes('failed'))) ||
     lowerMessage.includes('request failed with status') ||
     lowerMessage.includes('request failed with status code')
-  ) return 'Invalid email or password. Please check your credentials and try again.';
+  ) return 'Invalid email or password';
 
   return message || 'An unexpected error occurred. Please try again.';
 }

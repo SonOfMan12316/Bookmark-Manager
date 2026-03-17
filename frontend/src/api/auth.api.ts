@@ -3,12 +3,13 @@ import { API_ENDPOINTS } from './endpoints';
 import type {
   SignupDto,
   LoginDto,
-  ForgotPasswordDto,
-  ResetPasswordDto,
   LoggedInUserDto,
   UserDataDto,
-  APIResponseDto,
 } from './types';
+
+export interface GoogleAuthDto {
+  code: string;
+}
 
 /**
  * Auth API functions
@@ -37,22 +38,11 @@ export const authApi = {
   },
 
   /**
-   * Request password reset
+   * Sign in with Google
    */
-  forgotPassword: async (data: ForgotPasswordDto): Promise<APIResponseDto> => {
-    const response = await client.post<APIResponseDto>(
-      API_ENDPOINTS.AUTH.FORGOT_PASSWORD,
-      data
-    );
-    return response.data;
-  },
-
-  /**
-   * Reset password with token
-   */
-  resetPassword: async (data: ResetPasswordDto): Promise<APIResponseDto> => {
-    const response = await client.post<APIResponseDto>(
-      API_ENDPOINTS.AUTH.RESET_PASSWORD,
+  googleAuth: async (data: GoogleAuthDto): Promise<LoggedInUserDto> => {
+    const response = await client.post<LoggedInUserDto>(
+      API_ENDPOINTS.AUTH.GOOGLE,
       data
     );
     return response.data;

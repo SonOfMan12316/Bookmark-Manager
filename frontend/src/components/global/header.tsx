@@ -10,7 +10,7 @@ import {
   SignOut,
   Sun,
 } from '../icons'
-import { Button, Input, PopOver } from '../ui'
+import { Button, Input, LoadingDots, PopOver } from '../ui'
 import useUIStore from '../../store/ui'
 import { useBookmarksStore } from '../../store'
 import { useNotification } from '../../hooks'
@@ -32,12 +32,16 @@ const Header = ({ setShowSidenav }: HeaderProps) => {
   const handleModalOpen = useCallback(() => setModalType('add'), [])
 
   const handleLogout = useCallback(() => {
-    logout()
-    navigate('/sign-in')
-    addNotification({
-      id: 'logout-notification-id',
-      message: 'Logged out successfully.',
-      duration: 5000,
+    if (logout.isPending) return
+    logout.mutate(undefined, {
+      onSuccess: () => {
+        navigate('/sign-in')
+        addNotification({
+          id: 'logout-notification-id',
+          message: 'Logged out successfully.',
+          duration: 5000,
+        })
+      },
     })
   }, [logout, navigate, addNotification])
 
@@ -123,10 +127,18 @@ const Header = ({ setShowSidenav }: HeaderProps) => {
                 <div className="py-1">
                   <div
                     onClick={handleLogout}
-                    className="flex items-center gap-2 p-2 cursor-pointer rounded-md dark:hover:bg-ch-dark-mode-neutral-500 hover:bg-ch-light-mode-neutral-100 text-ch-light-mode-neutral-800 dark:text-ch-dark-mode-neutral-100 dark:hover:text-white hover:text-black transition-colors"
+                    className={`flex items-center gap-2 p-2 rounded-md transition-colors
+                      ${
+                        logout.isPending
+                          ? 'cursor-not-allowed opacity-60'
+                          : 'cursor-pointer dark:hover:bg-ch-dark-mode-neutral-500 hover:bg-ch-light-mode-neutral-100 dark:hover:text-white hover:text-black'
+                      }
+                      text-ch-light-mode-neutral-800 dark:text-ch-dark-mode-neutral-100`}
                   >
                     <SignOut />
-                    <span className="font-semibold text-sm">Logout</span>
+                    <span className="font-semibold text-sm">
+                      {logout.isPending ? <LoadingDots /> : 'Logout'}
+                    </span>
                   </div>
                 </div>
               </div>
