@@ -31,6 +31,10 @@ export class UserService {
     return this.userModel.findOne({ email });
   }
 
+  async findByGoogleId(googleId: string): Promise<User | null> {
+    return this.userModel.findOne({ googleId });
+  }
+
   async findById(id: string) {
     return this.userModel.findById(id);
   }

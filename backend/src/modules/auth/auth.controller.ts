@@ -3,14 +3,12 @@ import { Request } from 'express';
 import { ApiTags, ApiOperation, ApiResponse, ApiBody, ApiBearerAuth } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
 import { SignupDto } from './dto/signup.dto';
-import { APIResponseDto } from 'src/resources/dto/api-response.dto';
 import { LoggedInUserDto } from './dto/logged-in-user.dto';
 import { LoginDto } from './dto/login.dto';
-import { ForgotPasswordDto } from './dto/forgot-password.dto';
 import { UserDataDto } from '../user/dto/user-data.dto';
-import { ResetPasswordDto } from './dto/reset-password.dto';
 import { JwtAuthGuard } from './guards/jwt-auth/jwt-auth.guard';
 import { JwtPayload } from './jwt.service';
+import { GoogleAuthDto } from './dto/google-auth.dto';
 
 @ApiTags('Authentication')
 @Controller('auth')
@@ -69,36 +67,29 @@ export class AuthController {
     return this.authService.login(loginDto)
   }
 
-  @Post('forgot-password')
-  @ApiOperation({ summary: 'Request password reset', description: 'Sends a password reset email to the user' })
-  @ApiBody({ type: ForgotPasswordDto })
+  @Post('google')
+  @ApiOperation({ summary: 'Sign in with Google', description: 'Authenticates a user using Google OAuth and returns user data with authentication tokens' })
+  @ApiBody({ type: GoogleAuthDto })
   @ApiResponse({ 
     status: HttpStatus.OK, 
-    description: 'Password reset email sent successfully',
-    type: APIResponseDto,
+    description: 'User successfully authenticated with Google',
+    type: LoggedInUserDto,
     example: {
-      message: "Password reset email sent successfully"
+      user: {
+        id: "507f1f77bcf86cd799439011",
+        fullName: "John Doe",
+        email: "john.doe@example.com",
+        emailVerified: true
+      },
+      tokens: {
+        accessToken: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+        refreshToken: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+      }
     }
   })
-  @ApiResponse({ status: HttpStatus.NOT_FOUND, description: 'User not found' })
-  async forgotPassword(@Body() forgotPasswordDto: ForgotPasswordDto): Promise<APIResponseDto> {
-    return this.authService.forgotPassword(forgotPasswordDto.email)
-  }
-
-  @Post('reset-password')
-  @ApiOperation({ summary: 'Reset password', description: 'Resets user password using the token received via email' })
-  @ApiBody({ type: ResetPasswordDto })
-  @ApiResponse({ 
-    status: HttpStatus.OK, 
-    description: 'Password reset successfully',
-    type: APIResponseDto,
-    example: {
-      message: "Password reset successfully"
-    }
-  })
-  @ApiResponse({ status: HttpStatus.BAD_REQUEST, description: 'Invalid or expired token' })
-  async resetPassword(@Body() resetPasswordDto: ResetPasswordDto): Promise<APIResponseDto> {
-    return this.authService.resetPassword(resetPasswordDto)
+  @ApiResponse({ status: HttpStatus.UNAUTHORIZED, description: 'Invalid Google token' })
+  async googleAuth(@Body() googleAuthDto: GoogleAuthDto): Promise<LoggedInUserDto> {
+    return this.authService.googleAuth(googleAuthDto)
   }
 
   @Get('current-user')

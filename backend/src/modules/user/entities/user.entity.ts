@@ -11,8 +11,11 @@ export class User extends Document {
   @Prop({type: String, required: true, unique: true})
   email: string;
 
-  @Prop({ required: true })
+  @Prop({ required: false })
   password: string;
+
+  @Prop({ type: String, unique: true, sparse: true })
+  googleId: string;
 
   @Prop({ default: false })
   emailVerified: boolean;

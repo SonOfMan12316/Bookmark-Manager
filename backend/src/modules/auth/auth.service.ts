@@ -1,36 +1,38 @@
-import { Injectable, ConflictException, UnauthorizedException, BadRequestException, NotFoundException } from '@nestjs/common';
-import { Model } from 'mongoose';
-import { randomBytes } from 'crypto';
+import { Injectable, ConflictException, UnauthorizedException, NotFoundException, BadRequestException } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
+import { OAuth2Client } from 'google-auth-library';
 import { UserService } from '../user/user.service';
-import { MailService } from 'src/services/mail/mail.service';
 import { AuthJwtService } from './jwt.service';
-import { PasswordResetToken } from '../user/entities/password-reset-token.schema';
 import { SignupDto } from './dto/signup.dto';
 import { LoggedInUserDto } from './dto/logged-in-user.dto';
 import { TokenDto } from './dto/token.dto';
 import { UserDataDto } from '../user/dto/user-data.dto';
 import { LoginDto } from './dto/login.dto';
-import { InjectModel } from '@nestjs/mongoose';
-import { APIResponseDto } from 'src/resources/dto/api-response.dto';
-import { ResetPasswordDto } from './dto/reset-password.dto';
+import { GoogleAuthDto } from './dto/google-auth.dto';
+import { AppConfig } from 'src/app.config';
 
 @Injectable()
 export class AuthService {
   constructor(
     private usersService: UserService,
-    private mailService: MailService,
     private jwtService: AuthJwtService,
-    @InjectModel(PasswordResetToken.name) private passwordResetTokenModel: Model<PasswordResetToken>
-  ) {
-  }
+  ) {}
 
   async signUp(signUpDto: SignupDto): Promise<LoggedInUserDto> {
     const existingUser = await this.usersService.findByEmail(signUpDto.email);
-    if(existingUser) throw new ConflictException('Email already exists');
+    if (existingUser) {
+      if (existingUser.googleId) {
+        throw new ConflictException('This email is already registered with Google. Please sign in with Google.');
+      }
+      throw new ConflictException('Email already exists');
+    }
+
+    if (!signUpDto.password) {
+      throw new BadRequestException('Password is required');
+    }
 
     const hashedPassword = await bcrypt.hash(signUpDto.password, 10);
-    
+
     const user = await this.usersService.create({
       email: signUpDto.email,
       password: hashedPassword,
@@ -38,77 +40,99 @@ export class AuthService {
     });
 
     const token = await this.jwtService.generateToken(user._id.toString(), user.email);
-
     return new LoggedInUserDto(new UserDataDto(user), new TokenDto(token, token));
   }
 
   async login(loginDto: LoginDto): Promise<LoggedInUserDto> {
     const { email, password } = loginDto;
     const user = await this.usersService.findByEmail(email);
-    if(!user) throw new UnauthorizedException('Invalid credentials');
-    
+    if (!user) throw new UnauthorizedException('Invalid credentials');
+
+    if (!user.password) {
+      throw new UnauthorizedException('This account uses Google sign-in. Please sign in with Google.');
+    }
+
     const isPasswordValid = await this.usersService.verifyPassword(password, user.password);
-    if(!isPasswordValid) throw new UnauthorizedException('Invalid credentials');
-    
+    if (!isPasswordValid) throw new UnauthorizedException('Invalid credentials');
+
     const token = await this.jwtService.generateToken(user._id.toString(), user.email);
-    
     return new LoggedInUserDto(new UserDataDto(user), new TokenDto(token, token));
   }
 
-  async forgotPassword(email: string): Promise<APIResponseDto> {
-    const user = await this.usersService.findByEmail(email);
-    if(!user) return new APIResponseDto('If the email exists, a password reset link has been sent')
+  async googleAuth(googleAuthDto: GoogleAuthDto): Promise<LoggedInUserDto> {
+    const config = AppConfig();
 
-    const resetToken = randomBytes(32).toString('hex');
-    const expiresAt = new Date();
-    expiresAt.setHours(expiresAt.getHours() + 1)
+    if (!config.GOOGLE_CLIENT_ID || !config.GOOGLE_CLIENT_SECRET) {
+      throw new BadRequestException('Google OAuth is not configured');
+    }
 
-    await this.passwordResetTokenModel.deleteMany({ userId: user._id }).exec();
-
-    await this.passwordResetTokenModel.create({
-      userId: user._id,
-      token: resetToken,
-      expiresAt
-    })
+    const client = new OAuth2Client(
+      config.GOOGLE_CLIENT_ID,
+      config.GOOGLE_CLIENT_SECRET,
+    );
 
     try {
-      await this.mailService.sendPasswordResetEmail(user.email, resetToken)
+      const { tokens } = await client.getToken({
+        code: googleAuthDto.code,
+        redirect_uri: 'postmessage',
+      });
+
+      if (!tokens.id_token) {
+        throw new UnauthorizedException('Failed to get ID token from Google');
+      }
+
+      const ticket = await client.verifyIdToken({
+        idToken: tokens.id_token,
+        audience: config.GOOGLE_CLIENT_ID,
+      });
+
+      const payload = ticket.getPayload();
+      if (!payload) {
+        throw new UnauthorizedException('Invalid Google token');
+      }
+
+      const { sub: googleId, email, name } = payload;
+
+      if (!email || !googleId) {
+        throw new BadRequestException('Google account missing required information');
+      }
+
+      let user = await this.usersService.findByGoogleId(googleId);
+
+      if (!user) {
+        const existingUser = await this.usersService.findByEmail(email);
+
+        if (existingUser) {
+          existingUser.googleId = googleId;
+          await existingUser.save();
+          user = existingUser;
+        } else {
+          user = await this.usersService.create({
+            email,
+            fullName: name || email.split('@')[0],
+            googleId,
+          });
+        }
+      }
+
+      const token = await this.jwtService.generateToken(user._id.toString(), user.email);
+      return new LoggedInUserDto(new UserDataDto(user), new TokenDto(token, token));
     } catch (error) {
-      await this.passwordResetTokenModel.deleteOne({ token: resetToken }).exec();
-      throw new BadRequestException('Failed to send password reset email');
+      if (error instanceof UnauthorizedException || error instanceof BadRequestException) {
+        throw error;
+      }
+      throw new UnauthorizedException('Failed to authenticate with Google');
     }
-
-    return new APIResponseDto('If the email exists, a password reset link has been sent')
-  }
-
-  async resetPassword(resetPasswordDto: ResetPasswordDto): Promise<APIResponseDto> {
-    const resetTokenDoc = await this.passwordResetTokenModel.findOne({
-      token: resetPasswordDto.token
-    }).exec();
-
-    if(!resetTokenDoc) throw new BadRequestException('Invalid or expired reset token');
-
-    if (new Date() > resetTokenDoc.expiresAt) {
-      await this.passwordResetTokenModel.deleteOne({ token: resetPasswordDto.token }).exec();
-      throw new BadRequestException('Reset token has expired');
-    }
-
-    await this.usersService.updatePassword(resetTokenDoc.userId.toString(), resetPasswordDto.newPassword);
-
-    await this.passwordResetTokenModel.deleteOne({ token: resetPasswordDto.token }).exec();
-
-    return new APIResponseDto('Password has been reset successfully');
   }
 
   async getCurrentUser(userId: string) {
     const user = await this.usersService.findById(userId);
-    if(!user) throw new NotFoundException('User not found');
+    if (!user) throw new NotFoundException('User not found');
 
     return {
       id: user._id.toString(),
       email: user.email,
       fullName: user.fullName,
-      emailVerified: user.emailVerified
     }
   }
 }
