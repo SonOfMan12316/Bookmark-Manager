@@ -1,5 +1,5 @@
 import { Type } from "class-transformer";
-import { IsEmail, IsNotEmpty, IsString, MinLength, IsOptional } from "class-validator";
+import { IsEmail, IsNotEmpty, IsString, MinLength, IsOptional, IsBoolean } from "class-validator";
 
 export class CreateUserDto {
   @IsString()
@@ -18,4 +18,8 @@ export class CreateUserDto {
   @IsString()
   @IsOptional()
   googleId?: string;
+
+  @IsBoolean()
+  @IsOptional()
+  emailVerified?: boolean;
 }

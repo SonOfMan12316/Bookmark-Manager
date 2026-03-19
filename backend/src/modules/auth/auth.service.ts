@@ -104,6 +104,8 @@ export class AuthService {
 
         if (existingUser) {
           existingUser.googleId = googleId;
+          // Google OAuth emails are verified by default.
+          existingUser.emailVerified = true;
           await existingUser.save();
           user = existingUser;
         } else {
@@ -111,6 +113,7 @@ export class AuthService {
             email,
             fullName: name || email.split('@')[0],
             googleId,
+            emailVerified: true,
           });
         }
       }
@@ -133,6 +136,7 @@ export class AuthService {
       id: user._id.toString(),
       email: user.email,
       fullName: user.fullName,
+      emailVerified: Boolean(user.emailVerified),
     }
   }
 }
