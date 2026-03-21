@@ -18,7 +18,12 @@ import { PopOver, Dialog } from '../ui'
 import { ensureUrl } from '../../utils/validators'
 import { useNotification } from '../../hooks'
 import { useUIStore } from '../../store'
-import { useBookmarksStore } from '../../store'
+import {
+  usePinBookmark,
+  useArchiveBookmark,
+  useDeleteBookmark,
+  useTrackVisit,
+} from '../../hooks/api'
 
 interface BookmarkProp {
   bookmark: Bookmark
@@ -51,7 +56,10 @@ const BookmarkCard = ({ bookmark }: BookmarkProp) => {
   const { addNotification } = useNotification()
 
   const { setModalType, setSelectedBookmark, setSelectedBookmarkId } = useUIStore()
-  const { archiveBookmark, unarchiveBookmark, deleteBookmark, pinBookmark, unpinBookmark, trackVisit } = useBookmarksStore()
+  const { mutate: pinBookmark } = usePinBookmark()
+  const { mutate: archiveBookmark } = useArchiveBookmark()
+  const { mutate: deleteBookmark } = useDeleteBookmark()
+  const { mutate: trackVisit } = useTrackVisit()
 
   const handleCopyUrl = async () => {
     try {
@@ -72,24 +80,17 @@ const BookmarkCard = ({ bookmark }: BookmarkProp) => {
     }
   }
 
-  const handlePin = (bookmark: Bookmark) => {
-    if(bookmark.pinned) {
-      unpinBookmark(bookmark.id)
-      addNotification({
-        id: 'un-pin-bookmark-id',
-        message: 'Bookmark unpinned.',
-        icon: <Pin />,
-        duration: 5000,
-      })
-    } else {
-      pinBookmark(bookmark.id)
-      addNotification({
-        id: 'pin-bookmark-id',
-        message: 'Bookmark pinned to top.',
-        icon: <Pin />,
-        duration: 5000,
-      })
-    }
+  const handlePin = (b: Bookmark) => {
+    pinBookmark(b.id, {
+      onSuccess: () => {
+        addNotification({
+          id: 'pin-bookmark-id',
+          message: b.pinned ? 'Bookmark unpinned.' : 'Bookmark pinned to top.',
+          icon: <Pin />,
+          duration: 5000,
+        })
+      },
+    })
   }
 
   const openArchiveDialog = () => {
@@ -114,32 +115,42 @@ const BookmarkCard = ({ bookmark }: BookmarkProp) => {
 
   const handleDialogConfirm = () => {
     if (dialogState.action === 'delete') {
-      deleteBookmark(bookmark.id)
-      addNotification({
-        id: 'delete-bookmark-id',
-        message: 'Bookmark deleted.',
-        icon: <Trash />,
-        duration: 5000,
+      deleteBookmark(bookmark.id, {
+        onSuccess: () => {
+          addNotification({
+            id: 'delete-bookmark-id',
+            message: 'Bookmark deleted.',
+            icon: <Trash />,
+            duration: 5000,
+          })
+          closeDialog()
+        },
       })
     } else if (dialogState.action === 'archive') {
-      archiveBookmark(bookmark.id)
-      addNotification({
-        id: 'archive-bookmark-id',
-        message: 'Bookmark archived.',
-        icon: <Archive />,
-        duration: 5000,
+      archiveBookmark(bookmark.id, {
+        onSuccess: () => {
+          addNotification({
+            id: 'archive-bookmark-id',
+            message: 'Bookmark archived.',
+            icon: <Archive />,
+            duration: 5000,
+          })
+          closeDialog()
+        },
       })
     } else if (dialogState.action === 'unarchive') {
-      unarchiveBookmark(bookmark.id)
-      addNotification({
-        id: 'archive-bookmark-id',
-        message: 'Bookmark restored.',
-        icon: <Refresh />,
-        duration: 5000,
+      archiveBookmark(bookmark.id, {
+        onSuccess: () => {
+          addNotification({
+            id: 'archive-bookmark-id',
+            message: 'Bookmark restored.',
+            icon: <Refresh />,
+            duration: 5000,
+          })
+          closeDialog()
+        },
       })
     }
-
-    closeDialog()
   }
 
   const dialogCopy = (() => {
@@ -179,9 +190,9 @@ const BookmarkCard = ({ bookmark }: BookmarkProp) => {
   }
 
   const handleVisit = (bookmarkToVisit?: Bookmark) => {
-    const targetBookmark = bookmarkToVisit || bookmark
-    trackVisit(targetBookmark.id)
-    window.open(ensureUrl(targetBookmark.url), '_blank', 'noopener,noreferrer')
+    const target = bookmarkToVisit || bookmark
+    trackVisit(target.id)
+    window.open(ensureUrl(target.url), '_blank', 'noopener,noreferrer')
   }
 
   const activeActions: ActionItem[] = [
@@ -208,17 +219,17 @@ const BookmarkCard = ({ bookmark }: BookmarkProp) => {
     >
       <div className="h-[13.5rem] flex flex-col justify-between">
         <div className="flex justify-between pb-4 border-b-[1.45px] border-b-ch-light-mode-neutral-100 dark:border-b-ch-dark-mode-neutral-500">
-          <div className="flex items-center gap-2.5">
+          <div className="flex items-center gap-2.5 flex-1 min-w-0">
             <img
               className="h-10 w-10 border-[1.45px] border-ch-light-mode-neutral-100 dark:border-ch-dark-mode-neutral-500 rounded-lg"
               src={bookmark.favicon}
               alt={`${bookmark.title}`}
             />
-            <div className="flex flex-col">
+            <div className="flex flex-col min-w-0">
               <h1 className="text-ch-light-mode-neutral-900 dark:text-white font-bold text-xl">
                 {bookmark.title}
               </h1>
-              <span className="text-xs font-medium text-ch-light-mode-neutral-800 dark:text-ch-dark-mode-neutral-100 text-wrap">
+              <span className="text-xs font-medium text-ch-light-mode-neutral-800 dark:text-ch-dark-mode-neutral-100 truncate">
                 {bookmark.url.replace(/^https?:\/\/(www\.)?/, '')}
               </span>
             </div>
@@ -228,41 +239,23 @@ const BookmarkCard = ({ bookmark }: BookmarkProp) => {
             isOpen={popOpen}
             setIsOpen={setPopOpen}
             trigger={
-              <div className="cursor-pointer h-8 w-8 flex items-center justify-center border-[1px] hover:bg-ch-light-mode-neutral-100 dark:hover:bg-ch-dark-mode-neutral-400/30 border-ch-light-mode-neutral-400 dark:border-ch-dark-mode-neutral-500 bg-white dark:bg-ch-dark-mode-neutral-800 rounded-lg">
+              <div className="cursor-pointer h-8 w-8 flex items-center justify-center shrink-0 border-[1px] hover:bg-ch-light-mode-neutral-100 dark:hover:bg-ch-light-mode-neutral-400/30 border-ch-light-mode-neutral-400 dark:border-ch-dark-mode-neutral-500 bg-white dark:bg-ch-dark-mode-neutral-800 rounded-lg">
                 <VerticalDots className="text-ch-light-mode-neutral-900 dark:text-white" />
               </div>
             }
             triggerVariant="naked"
           >
             <div className="p-2 w-[200px]">
-              {actions.map(({ icon, onClick, label, href }) => (
+              {actions.map(({ icon, onClick, label }) => (
                 <div
                   key={label}
                   onClick={onClick ? () => onClick(bookmark) : undefined}
                 >
                   <div className="flex items-center justify-start p-2 font-semibold text-sm cursor-pointer rounded-md dark:hover:bg-ch-dark-mode-neutral-500 hover:bg-ch-light-mode-neutral-100 text-ch-light-mode-neutral-800 dark:text-ch-dark-mode-neutral-100 dark:hover:text-white transition-colors w-full">
-                    {href && !onClick ? (
-                      <a
-                        target="_blank"
-                        href={ensureUrl(bookmark.url)}
-                        rel="noopener noreferrer"
-                        className="flex items-center w-full"
-                      >
-                        <>
-                          <span className="w-6 flex-shrink-0 flex items-center hover:text-black">
-                            {icon}
-                          </span>
-                          <span className="truncate">{label}</span>
-                        </>
-                      </a>
-                    ) : (
-                      <>
-                        <span className="w-6 flex-shrink-0 flex items-center hover:text-black">
-                          {icon}
-                        </span>
-                        <span className="truncate">{label}</span>
-                      </>
-                    )}
+                    <span className="w-6 flex-shrink-0 flex items-center hover:text-black">
+                      {icon}
+                    </span>
+                    <span className="truncate">{label}</span>
                   </div>
                 </div>
               ))}
