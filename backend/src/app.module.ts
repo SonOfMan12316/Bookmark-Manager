@@ -5,6 +5,7 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { UserModule } from './modules/user/user.module';
 import { AuthModule } from './modules/auth/auth.module';
+import { BookmarkModule } from './modules/bookmark/bookmark.module';
 import { AppConfig } from './app.config';
 import { LoggerService } from './services/logger/logger.service';
 
@@ -17,6 +18,7 @@ import { LoggerService } from './services/logger/logger.service';
     MongooseModule.forRoot(AppConfig().MONGODB_URI),
     UserModule,
     AuthModule,
+    BookmarkModule,
   ],
   controllers: [AppController],
   providers: [AppService, LoggerService],
