@@ -11,6 +11,13 @@ import {
 } from './components/pages'
 import { useThemeInitializer } from './hooks'
 import { ToastContainer, ToastNotificationProvider } from './components/Toast'
+import type { ReactNode } from 'react'
+
+const ProtectedRoute = ({ children }: { children: ReactNode }) => {
+  const accessToken = localStorage.getItem('accessToken')
+  if (!accessToken) return <Navigate to="/sign-in" replace />
+  return <>{children}</>
+}
 
 const App = () => {
   useThemeInitializer()
@@ -21,7 +28,14 @@ const App = () => {
           <Route path="/" element={<Navigate to="sign-in" />} />
           <Route path="/sign-in" element={<SignIn />} />
           <Route path="/sign-up" element={<SignUp />} />
-          <Route path="/home" element={<Home />} />
+          <Route
+            path="/home"
+            element={
+              <ProtectedRoute>
+                <Home />
+              </ProtectedRoute>
+            }
+          />
         </Routes>
       </Router>
 

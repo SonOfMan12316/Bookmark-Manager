@@ -2,10 +2,11 @@ import { useState, useCallback, useMemo } from 'react'
 import { sortOptions } from '../../data/bookmark'
 import { Checkmark, Switch } from '../icons'
 import Layout from '../layouts/layout'
-import { PopOver, Modal } from '../ui'
+import { PopOver, Modal, LoadingDots } from '../ui'
 import { BookmarkCard, BookmarkForm } from '../Bookmark'
 import useUIStore from '../../store/ui'
 import { useBookmarksStore } from '../../store'
+import { useBookmarks } from '../../hooks/api'
 import type { BookmarkFilter, SortBy } from '../../types/global'
 
 interface HeaderSectionProp {
@@ -99,7 +100,6 @@ const Home = () => {
 
   const { modalType, setModalType, setSelectedBookmarkId } = useUIStore()
   const {
-    bookmarks,
     filter,
     searchQuery,
     selectedTags,
@@ -108,14 +108,18 @@ const Home = () => {
     setSortBy,
   } = useBookmarksStore()
 
+  const { data: bookmarks = [], isLoading } = useBookmarks()
+
   const filteredBookmarks = useMemo(
-    () => getFilteredBookmarks(),
-    [bookmarks, filter, searchQuery, selectedTags, getFilteredBookmarks, sortBy]
+    () => getFilteredBookmarks(bookmarks),
+    [bookmarks, filter, searchQuery, selectedTags, sortBy, getFilteredBookmarks]
   )
+
   const handleModalClose = useCallback(() => {
     setModalType(null)
     setSelectedBookmarkId(null)
-  }, [])
+  }, [setModalType, setSelectedBookmarkId])
+
   const addModal = modalType === 'add'
 
   return (
@@ -130,7 +134,11 @@ const Home = () => {
         selectedTags={selectedTags}
       />
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-        {filteredBookmarks.length > 0 ? (
+        {isLoading ? (
+          <div className="col-span-full flex items-center justify-center py-16">
+            <LoadingDots />
+          </div>
+        ) : filteredBookmarks.length > 0 ? (
           filteredBookmarks.map((bookmark) => (
             <BookmarkCard key={bookmark.id} bookmark={bookmark} />
           ))

@@ -1,9 +1,9 @@
-import { useState, type ReactNode } from 'react'
+import { useState, useMemo, type ReactNode } from 'react'
 import { Archive, Cancel, Home, Logo } from '../icons'
 import { CustomCheckBox } from '../ui'
-import { TagOption } from '../../data/bookmark'
 import { useClickOutside } from '../../hooks'
 import { useBookmarksStore } from '../../store'
+import { useBookmarks } from '../../hooks/api'
 
 type Categorylabel = 'Home' | 'Archive'
 
@@ -32,6 +32,19 @@ interface SidenavProp {
 const SideNav = ({ showSidenav, setShowSidenav }: SidenavProp) => {
   const { setFilter, filterByTags, isTagSelected, selectedTags, clearSelectedTags } = useBookmarksStore()
   const [activeCategory, setActveCategory] = useState<Categorylabel>('Home')
+  const { data: bookmarks = [] } = useBookmarks()
+
+  const tagOptions = useMemo(() => {
+    const tagMap = new Map<string, number>()
+    bookmarks
+      .filter((b) => !b.isArchived)
+      .forEach((b) =>
+        b.tags.forEach((tag) => tagMap.set(tag, (tagMap.get(tag) || 0) + 1))
+      )
+    return Array.from(tagMap.entries())
+      .sort(([a], [b]) => a.localeCompare(b))
+      .map(([name, count]) => ({ name, count }))
+  }, [bookmarks])
 
   const sideNavRef = useClickOutside(() => {
     setShowSidenav(false)
@@ -41,9 +54,9 @@ const SideNav = ({ showSidenav, setShowSidenav }: SidenavProp) => {
     <div
       ref={sideNavRef}
       className={`
-        flex flex-col z-50 h-full py-3 w-[296px] 
+        flex flex-col z-50 h-full py-3 w-[296px]
       bg-white dark:bg-ch-dark-mode-neutral-800  xl:border-none
-        transition-transform duration-300 ease-in-out 
+        transition-transform duration-300 ease-in-out
         fixed top-0 left-0 xl:static xl:z-auto
         xl:translate-x-0 xl:flex-shrink-0 xl:block
         ${
@@ -89,7 +102,7 @@ const SideNav = ({ showSidenav, setShowSidenav }: SidenavProp) => {
               <h1 onClick={() => clearSelectedTags()} className='font-medium text-right text-xs text-ch-lighter-grey dark:text-ch-dark-mode-neutral-100 border-b-[1.45px] border-ch-lightest-grey dark:border-ch-dark-mode-neutral-500 cursor-pointer'>Reset</h1>
             )}
           </div>
-          {TagOption.map((tag, index) => (
+          {tagOptions.map((tag, index) => (
           <div
             key={index}
             className="pl-4 pr-3 group flex justify-between items-center h-10 hover:bg-ch-light-mode-neutral-100 hover:text-black dark:hover:bg-ch-dark-mode-neutral-600 dark:hover:text-white text-ch-light-mode-neutral-800 dark:text-ch-dark-mode-neutral-100 rounded-lg cursor-pointer"

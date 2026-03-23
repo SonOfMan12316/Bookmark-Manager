@@ -15,6 +15,7 @@ import useUIStore from '../../store/ui'
 import { useBookmarksStore } from '../../store'
 import { useNotification } from '../../hooks'
 import { useLogout } from '../../hooks/api/useAuth'
+import { useAuth } from '../../hooks/useAuth'
 
 interface HeaderProps {
   setShowSidenav: (showSidenav: boolean) => void
@@ -28,6 +29,7 @@ const Header = ({ setShowSidenav }: HeaderProps) => {
   const navigate = useNavigate()
   const { addNotification } = useNotification()
   const logout = useLogout()
+  const { user, isLoading } = useAuth()
 
   const handleModalOpen = useCallback(() => setModalType('add'), [])
 
@@ -81,14 +83,14 @@ const Header = ({ setShowSidenav }: HeaderProps) => {
               triggerVariant="naked"
             >
               <div className="px-2 w-[248px]">
-                <div className="flex gap-2 py-3 px-2">
-                  <Avatar />
-                  <div>
-                    <h1 className="font-semibold text-sm dark:text-white text-ch-light-mode-neutral-900">
-                      Etidoh Beth
+                <div className="flex gap-2 py-3 px-2 items-center">
+                  <Avatar className="shrink-0" />
+                  <div className="flex flex-col min-w-0 flex-1">
+                    <h1 className="font-semibold text-sm dark:text-white text-ch-light-mode-neutral-900 truncate">
+                      {isLoading ? 'Loading...' : user?.fullName || '—'}
                     </h1>
-                    <span className="font-medium text-sm text-ch-light-mode-neutral-800 dark:text-ch-dark-mode-neutral-100">
-                      inokon@gmail.com
+                    <span className="font-medium text-sm text-ch-light-mode-neutral-800 dark:text-ch-dark-mode-neutral-100 truncate">
+                      {isLoading ? 'Loading...' : user?.email || '—'}
                     </span>
                   </div>
                 </div>
