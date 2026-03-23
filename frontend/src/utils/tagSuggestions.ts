@@ -39,14 +39,22 @@ const tokenize = (text: string) =>
     .map((t) => t.trim())
     .filter(Boolean)
 
+const isProbablyRealWordToken = (tokenLower: string) => {
+  if (!tokenLower) return false
+  if (tokenLower.length < 3 || tokenLower.length > 20) return false
+  if (!/[a-z]/.test(tokenLower)) return false
+  if (!/[aeiou]/.test(tokenLower)) return false
+  if (/^(.)\1+$/.test(tokenLower)) return false
+  return true
+}
+
 const takeTagCandidates = (tokens: string[], limit: number) => {
   const seen = new Set<string>()
   const out: string[] = []
 
   for (const token of tokens) {
     const t = normalizeToken(token)
-    if (t.length < 3) continue
-    if (t.length > 20) continue
+    if (!isProbablyRealWordToken(t)) continue
     if (STOP_WORDS.has(t)) continue
     if (TLD_TOKENS.has(t)) continue
 
@@ -76,15 +84,17 @@ export function suggestTags({ title, description, url }: SuggestTagsInput): stri
 
   const [host, ...pathParts] = cleaned.split('/')
   const hostTokens = host ? tokenize(host) : []
-
   const pathTokens = pathParts.flatMap((p) => tokenize(p))
 
-  // Tokens from title/description.
-  const textTokens = tokenize(`${titleStr} ${descStr}`)
+  const urlTokens = [...hostTokens, ...pathTokens]
+  const titleTokens = tokenize(titleStr)
+  const descTokens = tokenize(descStr)
 
-  // Rank: hostname/path first, then the surrounding text.
-  const candidates = [...hostTokens, ...pathTokens, ...textTokens]
+  const urlAndTitle = [...urlTokens, ...titleTokens]
+  const base = takeTagCandidates(urlAndTitle, 6)
+  if (base.length >= 3) return base
 
-  return takeTagCandidates(candidates, 6)
+  const withDescription = takeTagCandidates([...urlAndTitle, ...descTokens], 6)
+  return withDescription
 }
 
