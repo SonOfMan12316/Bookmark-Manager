@@ -23,11 +23,11 @@ const Layout = ({ children }: LayoutProp) => {
         >
           <Sidenav showSidenav={showSidenav} setShowSidenav={setShowSidenav} />
         </div>
-        <main className="flex flex-col w-full h-full">
-          <div className="sticky top-0 z-10">
+        <main className="flex flex-col w-full h-full min-h-0">
+          <div className="z-10">
             <Header setShowSidenav={setShowSidenav} />
           </div>
-          <div className="flex-grow overflow-y-auto px-4 sm:px-8 py-6">
+          <div className="flex-grow overflow-y-auto min-h-0 px-4 sm:px-8 py-6">
             {children}
           </div>
         </main>
