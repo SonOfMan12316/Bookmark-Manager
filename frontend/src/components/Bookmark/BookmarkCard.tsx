@@ -70,7 +70,7 @@ const BookmarkCard = ({ bookmark }: BookmarkProp) => {
         icon: <Copy />,
         duration: 5000,
       })
-    } catch (error) {
+    } catch {
       addNotification({
         id: 'copy-url-id',
         icon: <Copy />,
@@ -158,7 +158,7 @@ const BookmarkCard = ({ bookmark }: BookmarkProp) => {
       return {
         title: 'Delete bookmark',
         message: 'Are you sure you want to delete this bookmark?',
-        confirmText: 'Delete permanently',
+        confirmText: 'Delete Permanently',
         confirmVariant: 'remove' as const,
       }
     }
@@ -255,7 +255,7 @@ const BookmarkCard = ({ bookmark }: BookmarkProp) => {
                     <span className="w-6 flex-shrink-0 flex items-center hover:text-black">
                       {icon}
                     </span>
-                    <span className="truncate">{label}</span>
+                    <span className="truncate text-nowrap">{label}</span>
                   </div>
                 </div>
               ))}

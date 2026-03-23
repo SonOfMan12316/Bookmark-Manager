@@ -39,10 +39,10 @@ const ConfirmDialog = (props: ConfirmDialogProps) => {
             {message}
           </h1>
         </div>
-        <div className="flex mt-4 sm:mt-6 ju justify-center sm:justify-end pr-2">
+        <div className="flex mt-4 sm:mt-6 justify-center sm:justify-end pr-2">
           <div className="flex w-full gap-3 sm:gap-4 sm:w-auto">
             <Button
-              className="w-full sm:w-auto"
+              className="text-sm sm:text-base w-auto"
               variant="neutral"
               onClick={onCancel}
               aria-label="cancel dialog"
@@ -50,7 +50,7 @@ const ConfirmDialog = (props: ConfirmDialogProps) => {
               Cancel
             </Button>
             <Button
-              className="w-full sm:w-auto"
+              className="text-sm sm:text-base w-auto whitespace-nowrap"
               onClick={handleConfirm}
               variant={confirmVariant}
             >
